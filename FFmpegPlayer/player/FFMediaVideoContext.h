@@ -18,6 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, assign)NSInteger streamIndex;
 - (instancetype)initWithAVStream:(AVStream *)stream formatContext:(nonnull AVFormatContext *)formatContext;
 - (AVCodecContext *)codecContext;
+- (int)fps;
 @end
 
 NS_ASSUME_NONNULL_END

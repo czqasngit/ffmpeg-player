@@ -49,6 +49,9 @@ static void av_print_obj_all_options(void *obj) {
     AVFilterContext *bufferSinkContext;
 }
 
+- (void)dealloc {
+    if(graph) avfilter_graph_free(&graph);
+}
 - (instancetype)initWithVideoContext:(FFMediaVideoContext *)videoContext
                        formatContext:(AVFormatContext *)formatContext
                               stream:(AVStream *)stream
@@ -159,4 +162,18 @@ success:
     return YES;
 }
 
+- (BOOL)transformFormatWithInputFrame:(AVFrame *)inputFrame outputFrame:(AVFrame **)outputFrame {
+    int ret = av_buffersrc_add_frame(bufferContext, inputFrame);
+    if(ret < 0) {
+        NSLog(@"add frame to buffersrc failed.");
+        goto fail;
+    }
+    ret = av_buffersink_get_frame(bufferSinkContext, *outputFrame);
+    if(ret < 0) {
+        goto fail;
+    }
+    return YES;
+fail:
+    return NO;
+}
 @end

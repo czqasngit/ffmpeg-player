@@ -63,4 +63,7 @@ fail:
 - (AVCodecContext *)codecContext {
     return self->codecContext;
 }
+- (int)fps {
+    return av_q2d(stream->avg_frame_rate);
+}
 @end

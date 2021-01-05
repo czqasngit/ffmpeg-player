@@ -16,21 +16,34 @@
 @property (nonatomic, strong)FFMediaAudioContext *mediaAudio;
 @property (nonatomic, strong)FFFilter *filter;
 @property (nonatomic, strong)id<FFVideoRender> videoRender;
+@property (nonatomic, strong)NSTimer *displayTimer;
 @end
 @implementation FFEngine {
     AVFormatContext *formatContext;
+    dispatch_queue_t _decode_queue;
+    AVFrame *frame;
+    AVPacket *packet;
 }
 
 - (instancetype)initWithVideoRender:(id<FFVideoRender>)videoRender {
     self = [super init];
     if (self) {
         self.videoRender = videoRender;
+        _decode_queue = dispatch_queue_create("decode queue", DISPATCH_QUEUE_SERIAL);
     }
     return self;
 }
 - (void)dealloc {
     if(formatContext) {
         avformat_close_input(&formatContext);
+    }
+    if(frame) {
+        av_frame_unref(frame);
+        av_frame_free(&frame);
+    }
+    if(packet) {
+        av_packet_unref(packet);
+        av_packet_free(&packet);
     }
 }
 - (BOOL)setup:(const char *)url {
@@ -60,12 +73,50 @@
     self.filter = [[FFFilter alloc] initWithVideoContext:self.mediaVideo
                                            formatContext:formatContext stream:formatContext->streams[self.mediaVideo.streamIndex] outputFmt:[self.videoRender piexlFormat]];
     if(!self.filter) goto fail;
+    self->packet = av_packet_alloc();
+    self->frame = av_frame_alloc();
+    if(self.displayTimer) {
+        [self.displayTimer invalidate];
+        self.displayTimer = NULL;
+    }
+    self.displayTimer = [NSTimer scheduledTimerWithTimeInterval:1.0f / self.mediaVideo.fps
+                                                         target:self
+                                                       selector:@selector(displayNextFrame)
+                                                       userInfo:NULL
+                                                        repeats:YES];
     return YES;
 fail:
     if(formatContext) {
         avformat_close_input(&formatContext);
     }
     return NO;
+}
+
+#pragma mark - Private
+- (void)displayNextFrame {
+    dispatch_async(_decode_queue, ^{
+        bool stop = false;
+        while (!stop) {
+            av_packet_unref(self->packet);
+            if(av_read_frame(self->formatContext, self->packet) >= 0) {
+                if(self->packet->stream_index == self.mediaVideo.streamIndex) {
+                    int ret = avcodec_send_packet(self.mediaVideo.codecContext, self->packet);
+                    if(ret == 0) {
+                        av_frame_unref(self->frame);
+                        ret = avcodec_receive_frame(self.mediaVideo.codecContext, self->frame);
+                        if(ret == 0) {
+                            NSLog(@"读取到视频帧:%lld", self->frame->pts);
+                            stop = true;
+                        }
+                        av_frame_unref(self->frame);
+                    }
+                }
+                av_packet_unref(self->packet);
+            } else {
+                av_packet_unref(self->packet);
+            }
+        }
+    });
 }
 
 @end
