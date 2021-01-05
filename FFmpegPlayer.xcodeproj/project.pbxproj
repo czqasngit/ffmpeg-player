@@ -63,6 +63,8 @@
 		A09F446125A3403A001E4BCA /* liblzma.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = A09F435C25A2FB0F001E4BCA /* liblzma.tbd */; };
 		A09F446425A34041001E4BCA /* libbz2.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = A09F434F25A2FAC5001E4BCA /* libbz2.tbd */; };
 		A09F446725A34046001E4BCA /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = A09F433B25A2FA96001E4BCA /* libz.tbd */; };
+		A09F447225A464D8001E4BCA /* FFRGBRender.mm in Sources */ = {isa = PBXBuildFile; fileRef = A09F447125A464D8001E4BCA /* FFRGBRender.mm */; };
+		A09F447C25A4660B001E4BCA /* FFFilter.mm in Sources */ = {isa = PBXBuildFile; fileRef = A09F447B25A4660B001E4BCA /* FFFilter.mm */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -242,6 +244,11 @@
 		A09F444C25A33F31001E4BCA /* FFEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FFEngine.swift; sourceTree = "<group>"; };
 		A09F445025A33F48001E4BCA /* FFMediaVideoContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FFMediaVideoContext.swift; sourceTree = "<group>"; };
 		A09F445425A33F58001E4BCA /* FFMediaAudioContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FFMediaAudioContext.swift; sourceTree = "<group>"; };
+		A09F447025A464D8001E4BCA /* FFRGBRender.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FFRGBRender.h; sourceTree = "<group>"; };
+		A09F447125A464D8001E4BCA /* FFRGBRender.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = FFRGBRender.mm; sourceTree = "<group>"; };
+		A09F447525A4651D001E4BCA /* FFVideoRender.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FFVideoRender.h; sourceTree = "<group>"; };
+		A09F447A25A4660B001E4BCA /* FFFilter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FFFilter.h; sourceTree = "<group>"; };
+		A09F447B25A4660B001E4BCA /* FFFilter.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FFFilter.mm; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -583,6 +590,8 @@
 		A09F432C25A2F9E3001E4BCA /* player */ = {
 			isa = PBXGroup;
 			children = (
+				A09F446F25A4621B001E4BCA /* Audio */,
+				A09F446E25A46203001E4BCA /* Video */,
 				A09F432D25A2FA08001E4BCA /* FFPlayer.h */,
 				A09F432E25A2FA08001E4BCA /* FFPlayer.mm */,
 				A09F436C25A3045A001E4BCA /* FFEngine.h */,
@@ -591,6 +600,8 @@
 				A09F438325A30B70001E4BCA /* FFMediaVideoContext.mm */,
 				A09F438725A30B7C001E4BCA /* FFMediaAudioContext.h */,
 				A09F438825A30B7C001E4BCA /* FFMediaAudioContext.mm */,
+				A09F447A25A4660B001E4BCA /* FFFilter.h */,
+				A09F447B25A4660B001E4BCA /* FFFilter.mm */,
 			);
 			path = player;
 			sourceTree = "<group>";
@@ -637,6 +648,23 @@
 				A09F441E25A33DFC001E4BCA /* FFmpegPlayer-Swift-Bridging-Header.h */,
 			);
 			path = birdge;
+			sourceTree = "<group>";
+		};
+		A09F446E25A46203001E4BCA /* Video */ = {
+			isa = PBXGroup;
+			children = (
+				A09F447025A464D8001E4BCA /* FFRGBRender.h */,
+				A09F447125A464D8001E4BCA /* FFRGBRender.mm */,
+				A09F447525A4651D001E4BCA /* FFVideoRender.h */,
+			);
+			path = Video;
+			sourceTree = "<group>";
+		};
+		A09F446F25A4621B001E4BCA /* Audio */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Audio;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -747,7 +775,9 @@
 				A09F436E25A3045A001E4BCA /* FFEngine.mm in Sources */,
 				A09F424D25A2B879001E4BCA /* main.m in Sources */,
 				A09F432F25A2FA08001E4BCA /* FFPlayer.mm in Sources */,
+				A09F447C25A4660B001E4BCA /* FFFilter.mm in Sources */,
 				A09F438425A30B70001E4BCA /* FFMediaVideoContext.mm in Sources */,
+				A09F447225A464D8001E4BCA /* FFRGBRender.mm in Sources */,
 				A09F424225A2B877001E4BCA /* AppDelegate.m in Sources */,
 				A09F438925A30B7C001E4BCA /* FFMediaAudioContext.mm in Sources */,
 			);

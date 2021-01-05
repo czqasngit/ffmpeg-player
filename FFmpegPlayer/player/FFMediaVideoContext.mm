@@ -60,4 +60,7 @@ fail:
 - (NSInteger)streamIndex {
     return self->stream->index;
 }
+- (AVCodecContext *)codecContext {
+    return self->codecContext;
+}
 @end
