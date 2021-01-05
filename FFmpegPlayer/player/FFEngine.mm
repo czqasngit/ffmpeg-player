@@ -8,20 +8,18 @@
 #import "FFEngine.h"
 #import "FFMediaVideoContext.h"
 #import "FFMediaAudioContext.h"
-#import "FFFilter.h"
+
 #import "FFVideoRender.h"
 
 @interface FFEngine()
 @property (nonatomic, strong)FFMediaVideoContext *mediaVideo;
 @property (nonatomic, strong)FFMediaAudioContext *mediaAudio;
-@property (nonatomic, strong)FFFilter *filter;
 @property (nonatomic, strong)id<FFVideoRender> videoRender;
 @property (nonatomic, strong)NSTimer *displayTimer;
 @end
 @implementation FFEngine {
     AVFormatContext *formatContext;
     dispatch_queue_t _decode_queue;
-    AVFrame *frame;
     AVPacket *packet;
 }
 
@@ -37,10 +35,7 @@
     if(formatContext) {
         avformat_close_input(&formatContext);
     }
-    if(frame) {
-        av_frame_unref(frame);
-        av_frame_free(&frame);
-    }
+    
     if(packet) {
         av_packet_unref(packet);
         av_packet_free(&packet);
@@ -63,18 +58,14 @@
         AVStream *stream = formatContext->streams[i];
         AVMediaType mediaType = stream->codecpar->codec_type;
         if(mediaType == AVMEDIA_TYPE_VIDEO) {
-            _mediaVideo = [[FFMediaVideoContext alloc] initWithAVStream:stream formatContext:formatContext];
+            _mediaVideo = [[FFMediaVideoContext alloc] initWithAVStream:stream formatContext:formatContext fmt:[self.videoRender piexlFormat]];
             if(!_mediaVideo) goto fail;
         } else if(mediaType == AVMEDIA_TYPE_AUDIO) {
             _mediaAudio = [[FFMediaAudioContext alloc] initWithAVStream:stream formatContext:formatContext];
             if(!_mediaAudio) goto fail;
         }
     }
-    self.filter = [[FFFilter alloc] initWithVideoContext:self.mediaVideo
-                                           formatContext:formatContext stream:formatContext->streams[self.mediaVideo.streamIndex] outputFmt:[self.videoRender piexlFormat]];
-    if(!self.filter) goto fail;
     self->packet = av_packet_alloc();
-    self->frame = av_frame_alloc();
     if(self.displayTimer) {
         [self.displayTimer invalidate];
         self.displayTimer = NULL;
@@ -100,18 +91,12 @@ fail:
             av_packet_unref(self->packet);
             if(av_read_frame(self->formatContext, self->packet) >= 0) {
                 if(self->packet->stream_index == self.mediaVideo.streamIndex) {
-                    int ret = avcodec_send_packet(self.mediaVideo.codecContext, self->packet);
-                    if(ret == 0) {
-                        av_frame_unref(self->frame);
-                        ret = avcodec_receive_frame(self.mediaVideo.codecContext, self->frame);
-                        if(ret == 0) {
-                            NSLog(@"读取到视频帧:%lld", self->frame->pts);
-                            stop = true;
-                        }
-                        av_frame_unref(self->frame);
+                    AVFrame *frame = [self.mediaVideo decodePacket:self->packet];
+                    if(frame) {
+                        [self.videoRender displayWithAVFrame:frame];
+                        stop = YES;
                     }
                 }
-                av_packet_unref(self->packet);
             } else {
                 av_packet_unref(self->packet);
             }

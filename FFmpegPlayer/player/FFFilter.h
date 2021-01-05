@@ -18,7 +18,7 @@ extern "C" {
 NS_ASSUME_NONNULL_BEGIN
 
 @interface FFFilter : NSObject
-- (instancetype)initWithVideoContext:(FFMediaVideoContext *)videoContext
+- (instancetype)initWithCodecContext:(AVCodecContext *)codecContext
                        formatContext:(AVFormatContext *)formatContext
                               stream:(AVStream *)stream
                            outputFmt:(AVPixelFormat)outputFmt;

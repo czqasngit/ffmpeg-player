@@ -8,16 +8,19 @@
 #import "FFPlayer.h"
 #import "FFEngine.h"
 #import "FFRGBRender.h"
+#import "FFVideoRender.h"
 
 @interface FFPlayer()
 @property (nonatomic, strong)FFEngine *engine;
+@property (nonatomic, strong)id<FFVideoRender> videoRender;
 @end
 @implementation FFPlayer
 
 - (instancetype)init {
     self = [super init];
     if (self) {
-        _engine = [[FFEngine alloc] initWithVideoRender:[[FFRGBRender alloc] init]];
+        _videoRender = [[FFRGBRender alloc] init];
+        _engine = [[FFEngine alloc] initWithVideoRender:self.videoRender];
     }
     return self;
 }
@@ -38,5 +41,8 @@
         return NO;
     }
     return YES;
+}
+- (NSView *)renderView {
+    return (id)self.videoRender;
 }
 @end

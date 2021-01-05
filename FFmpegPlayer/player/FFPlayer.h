@@ -6,12 +6,13 @@
 //
 
 #import <Foundation/Foundation.h>
-
+#import <AppKit/AppKit.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface FFPlayer : NSObject
 - (BOOL)playWithUrl:(NSString *)url;
+- (NSView *)renderView;
 @end
 
 NS_ASSUME_NONNULL_END

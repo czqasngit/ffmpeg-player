@@ -6,8 +6,10 @@
 //
 
 #import "FFMediaVideoContext.h"
+#import "FFFilter.h"
 
 @interface FFMediaVideoContext()
+@property (nonatomic, strong)FFFilter *filter;
 @end
 @implementation FFMediaVideoContext {
     AVFormatContext *formatContext;
@@ -15,21 +17,44 @@
     AVCodec *codec;
     AVCodecContext *codecContext;
     int streamIndex;
+    AVPixelFormat fmt;
+    AVFrame *frame;
+    AVFrame *outputFrame;
 }
 - (void)dealloc {
     if(self->codecContext) {
         avcodec_close(codecContext);
         avcodec_free_context(&codecContext);
     }
+    if(frame) {
+        av_frame_unref(frame);
+        av_frame_free(&frame);
+    }
+    if(outputFrame) {
+        av_frame_unref(outputFrame);
+        av_frame_free(&outputFrame);
+    }
 }
-- (instancetype)initWithAVStream:(AVStream *)stream formatContext:(nonnull AVFormatContext *)formatContext {
+- (instancetype)initWithAVStream:(AVStream *)stream
+                   formatContext:(nonnull AVFormatContext *)formatContext
+                             fmt:(AVPixelFormat)fmt {
     self = [super init];
     if(self) {
         self->stream = stream;
         self->formatContext = formatContext;
+        self->fmt = fmt;
         if(![self _setup]) {
             return NULL;
         }
+        self.filter = [[FFFilter alloc] initWithCodecContext:codecContext
+                                               formatContext:formatContext
+                                                      stream:formatContext->streams[streamIndex]
+                                                   outputFmt:fmt];
+        if(!self.filter) {
+            return NULL;
+        }
+        self->frame = av_frame_alloc();
+        self->outputFrame = av_frame_alloc();
     }
     return self;
 }
@@ -56,6 +81,7 @@ fail:
     return NO;
 }
 
+
 #pragma mark - Public
 - (NSInteger)streamIndex {
     return self->stream->index;
@@ -65,5 +91,19 @@ fail:
 }
 - (int)fps {
     return av_q2d(stream->avg_frame_rate);
+}
+- (AVFrame *)decodePacket:(AVPacket *)packet {
+    int ret = avcodec_send_packet(self.codecContext, packet);
+    if(ret == 0) {
+        av_frame_unref(self->frame);
+        ret = avcodec_receive_frame(self.codecContext, self->frame);
+        if(ret == 0) {
+            av_frame_unref(outputFrame);
+            [self.filter transformFormatWithInputFrame:self->frame outputFrame:&outputFrame];
+            NSLog(@"读取到视频帧:%lld", self->outputFrame->pts);
+            return self->outputFrame;
+        }
+    }
+    return NULL;
 }
 @end

@@ -6,7 +6,6 @@
 //
 
 #import "FFFilter.h"
-#import "FFMediaVideoContext.h"
 
 /// 打印属于obj的所有AVOptions信息
 static void av_print_options(void *obj) {
@@ -38,10 +37,10 @@ static void av_print_obj_all_options(void *obj) {
 
 
 @interface FFFilter()
-@property (nonatomic, strong)FFMediaVideoContext *videoContext;
 @end
 @implementation FFFilter {
     AVFormatContext *formatContext;
+    AVCodecContext *codecContext;
     AVStream *stream;
     AVPixelFormat outputFmt;
     AVFilterGraph *graph;
@@ -52,13 +51,13 @@ static void av_print_obj_all_options(void *obj) {
 - (void)dealloc {
     if(graph) avfilter_graph_free(&graph);
 }
-- (instancetype)initWithVideoContext:(FFMediaVideoContext *)videoContext
+- (instancetype)initWithCodecContext:(AVCodecContext *)codecContext
                        formatContext:(AVFormatContext *)formatContext
                               stream:(AVStream *)stream
                            outputFmt:(AVPixelFormat)outputFmt {
     self = [super init];
     if (self) {
-        _videoContext = videoContext;
+        self->codecContext = codecContext;
         self->formatContext = formatContext;
         self->stream = stream;
         self->outputFmt = outputFmt;
@@ -72,7 +71,6 @@ static void av_print_obj_all_options(void *obj) {
     AVFilterInOut *inputs = avfilter_inout_alloc();
     AVFilterInOut *outputs = avfilter_inout_alloc();
     AVRational time_base = stream->time_base;
-    AVCodecContext *codecContext = self.videoContext.codecContext;
     const AVFilter *buffer = avfilter_get_by_name("buffer");
     const AVFilter *bufferSink = avfilter_get_by_name("buffersink");
     int ret = 0;
