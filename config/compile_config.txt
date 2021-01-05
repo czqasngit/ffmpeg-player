@@ -1,0 +1,1 @@
+./configure  --prefix=./macos --enable-gpl --enable-nonfree --enable-libfdk-aac
