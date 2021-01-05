@@ -17,9 +17,9 @@
     [super viewDidLoad];
     _player = [[FFPlayer alloc] init];
     NSString *videoUrl = [[NSBundle mainBundle] pathForResource:@"1280x720" ofType:@"mp4"];
-    [_player playWithUrl:videoUrl];
     [self.view addSubview:_player.renderView];
     _player.renderView.frame = CGRectMake(0, 0, 1280, 720);
+    [_player playWithUrl:videoUrl];
 }
 
 
