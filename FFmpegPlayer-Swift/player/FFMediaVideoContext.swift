@@ -75,7 +75,7 @@ extension FFMediaVideoContext {
         ret = avcodec_receive_frame(codecContext, frame)
         guard ret == 0 else { return nil }
         av_frame_unref(outputFrame)
-        guard filter.getTargetFMT(inputFrame: frame!, outputFrame: &(outputFrame!)) else { return nil }
+        guard filter.getTargetFormatFrame(inputFrame: frame!, outputFrame: &(outputFrame!)) else { return nil }
         return outputFrame
     }
 }

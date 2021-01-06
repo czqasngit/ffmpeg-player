@@ -90,8 +90,12 @@ class FFFilter {
 }
 
 extension FFFilter {
-    public func getTargetFMT(inputFrame: UnsafeMutablePointer<AVFrame>,
-                             outputFrame:UnsafeMutablePointer<UnsafeMutablePointer<AVFrame>>) -> Bool {
+    public func getTargetFormatFrame(inputFrame: UnsafeMutablePointer<AVFrame>,
+                                     outputFrame:UnsafeMutablePointer<UnsafeMutablePointer<AVFrame>>) -> Bool {
+        guard inputFrame.pointee.format != self.fmt.rawValue else {
+            av_frame_copy(outputFrame.pointee, inputFrame)
+            return true
+        }
         var ret = av_buffersrc_add_frame(bufferContext, inputFrame)
         guard ret == 0 else { return false }
         ret = av_buffersink_get_frame(bufferSinkContext, outputFrame.pointee)

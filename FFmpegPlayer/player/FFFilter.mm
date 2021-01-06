@@ -42,7 +42,7 @@ static void av_print_obj_all_options(void *obj) {
     AVFormatContext *formatContext;
     AVCodecContext *codecContext;
     AVStream *stream;
-    AVPixelFormat outputFmt;
+    AVPixelFormat fmt;
     AVFilterGraph *graph;
     AVFilterContext *bufferContext;
     AVFilterContext *bufferSinkContext;
@@ -56,13 +56,13 @@ static void av_print_obj_all_options(void *obj) {
 - (instancetype)initWithCodecContext:(AVCodecContext *)codecContext
                        formatContext:(AVFormatContext *)formatContext
                               stream:(AVStream *)stream
-                           outputFmt:(AVPixelFormat)outputFmt {
+                                 fmt:(AVPixelFormat)fmt {
     self = [super init];
     if (self) {
         self->codecContext = codecContext;
         self->formatContext = formatContext;
         self->stream = stream;
-        self->outputFmt = outputFmt;
+        self->fmt = fmt;
         if(![self setup]) return NULL;
     }
     return self;
@@ -76,7 +76,7 @@ static void av_print_obj_all_options(void *obj) {
     const AVFilter *buffer = avfilter_get_by_name("buffer");
     const AVFilter *bufferSink = avfilter_get_by_name("buffersink");
     int ret = 0;
-    enum AVPixelFormat format[] = {self->outputFmt};  //想要转换的格式
+    enum AVPixelFormat format[] = {self->fmt};  //想要转换的格式
     if(!buffer || !bufferSink) {
         NSLog(@"get buffer and buffersink filter failed.");
         goto fail;
@@ -110,8 +110,9 @@ static void av_print_obj_all_options(void *obj) {
      };
      */
     /// 这里的pix_fmts不能通过字符串的形式初始化,因为他的类型是一个AV_OPT_TYPE_BINARY
+    /// pix_fmts定义如下: enum AVPixelFormat *pixel_fmts; 它是一个指针
     /// 设置buffersink出口的数据格式是RGB24
-    ret = av_opt_set_bin(bufferSinkContext, "pix_fmts", (uint8_t *)&format, sizeof(self->outputFmt), AV_OPT_SEARCH_CHILDREN);
+    ret = av_opt_set_bin(bufferSinkContext, "pix_fmts", (uint8_t *)&format, sizeof(self->fmt), AV_OPT_SEARCH_CHILDREN);
     if (ret < 0) {
         NSLog(@"Set pix_fmts value to buffersink class error.");
         goto fail;
@@ -161,7 +162,11 @@ success:
     return YES;
 }
 
-- (BOOL)getTargetFMTWithInputFrame:(AVFrame *)inputFrame outputFrame:(AVFrame **)outputFrame {
+- (BOOL)getTargetFormatFrameWithInputFrame:(AVFrame *)inputFrame outputFrame:(AVFrame **)outputFrame {
+    if(inputFrame->format == self->fmt) {
+        av_frame_copy(*outputFrame, inputFrame);
+        return YES;
+    }
     int ret = av_buffersrc_add_frame(bufferContext, inputFrame);
     if(ret < 0) {
         NSLog(@"add frame to buffersrc failed.");

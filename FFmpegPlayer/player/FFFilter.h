@@ -21,8 +21,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithCodecContext:(AVCodecContext *)codecContext
                        formatContext:(AVFormatContext *)formatContext
                               stream:(AVStream *)stream
-                           outputFmt:(AVPixelFormat)outputFmt;
-- (BOOL)getTargetFMTWithInputFrame:(AVFrame *)inputFrame outputFrame:(AVFrame **)outputFrame;
+                                 fmt:(AVPixelFormat)fmt;
+- (BOOL)getTargetFormatFrameWithInputFrame:(AVFrame *)inputFrame outputFrame:(AVFrame **)outputFrame;
 @end
 
 NS_ASSUME_NONNULL_END

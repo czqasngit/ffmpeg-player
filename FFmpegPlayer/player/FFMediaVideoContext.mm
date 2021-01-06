@@ -49,7 +49,7 @@
         self.filter = [[FFFilter alloc] initWithCodecContext:codecContext
                                                formatContext:formatContext
                                                       stream:formatContext->streams[streamIndex]
-                                                   outputFmt:fmt];
+                                                         fmt:fmt];
         if(!self.filter) {
             return NULL;
         }
@@ -99,7 +99,7 @@ fail:
     ret = avcodec_receive_frame(self.codecContext, self->frame);
     if(ret == 0) {
         av_frame_unref(outputFrame);
-        [self.filter getTargetFMTWithInputFrame:self->frame
+        [self.filter getTargetFormatFrameWithInputFrame:self->frame
                                     outputFrame:&outputFrame];
         NSLog(@"读取到视频帧:%lld", self->outputFrame->pts);
         return self->outputFrame;
