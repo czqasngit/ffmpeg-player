@@ -18,6 +18,7 @@ class FFEngine {
     private var packet = av_packet_alloc()
     
     deinit {
+        av_packet_unref(packet)
         av_packet_free(&packet)
     }
     init(render: FFVideoRender) {
@@ -79,6 +80,7 @@ class FFEngine {
 extension FFEngine {
     @objc private func displayNext(frame: UnsafeMutablePointer<AVFrame>) {
         decodeQueue.async {
+            /// only display video use this variable
             var stop = false
             while(!stop) {
                 av_packet_unref(self.packet)

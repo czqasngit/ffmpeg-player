@@ -23,7 +23,9 @@ class FFMediaVideoContext {
             avcodec_close(self.codecContext)
             avcodec_free_context(&codecContext)
         }
+        av_frame_unref(frame)
         av_frame_free(&frame)
+        av_frame_unref(outputFrame);
         av_frame_free(&outputFrame)
     }
     public init?(stream: UnsafeMutablePointer<AVStream>?,

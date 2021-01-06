@@ -18,7 +18,7 @@ class FFPlayer {
     }
     public func play(url: String) -> Bool {
         guard engine.setup(url: url) else { return false }
-        
+
         return true;
     }
 }
