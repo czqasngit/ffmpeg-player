@@ -22,7 +22,7 @@ NS_ASSUME_NONNULL_BEGIN
                        formatContext:(AVFormatContext *)formatContext
                               stream:(AVStream *)stream
                            outputFmt:(AVPixelFormat)outputFmt;
-- (BOOL)transformFormatWithInputFrame:(AVFrame *)inputFrame outputFrame:(AVFrame **)outputFrame;
+- (BOOL)getTargetFMTWithInputFrame:(AVFrame *)inputFrame outputFrame:(AVFrame **)outputFrame;
 @end
 
 NS_ASSUME_NONNULL_END

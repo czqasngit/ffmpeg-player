@@ -12,7 +12,7 @@
 @property (nonatomic, strong)NSImageView *imageView;
 @end
 @implementation FFRGBRender {
-    dispatch_queue_t _display_rgb_queue;
+    dispatch_queue_t display_rgb_queue;
 }
 
 
@@ -20,13 +20,14 @@
 {
     self = [super initWithFrame:frame];
     if (self) {
-        _display_rgb_queue = dispatch_queue_create("display rgb queue", DISPATCH_QUEUE_SERIAL);
-        [self _setupImageView];
+        display_rgb_queue = dispatch_queue_create("display rgb queue",
+                                                  DISPATCH_QUEUE_SERIAL);
+        [self setupImageView];
     }
     return self;
 }
 
-- (void)_setupImageView {
+- (void)setupImageView {
     if(!_imageView) {
         _imageView = [[NSImageView alloc] init];
         [self addSubview:_imageView];
@@ -45,10 +46,11 @@
     int len = (linesize * videoHeight);
     UInt8 *bytes = (UInt8 *)malloc(len * sizeof(UInt8));
     memcpy(bytes, rgbFrame->data[0], len);
-    dispatch_async(_display_rgb_queue, ^{
+    dispatch_async(display_rgb_queue, ^{
         CFDataRef data = CFDataCreateWithBytesNoCopy(kCFAllocatorDefault, bytes, len, kCFAllocatorNull);
         if(!data) {
             NSLog(@"create CFDataRef failed.");
+            free(bytes);
             return;
         }
         if(CFDataGetLength(data) == 0) {
@@ -70,18 +72,21 @@
                                             NULL,
                                             YES,
                                             kCGRenderingIntentDefault);
+        NSSize size = NSSizeFromCGSize(CGSizeMake(videoWidth, videoHeight));
         NSImage *image = [[NSImage alloc] initWithCGImage:imageRef
-                                                     size:NSSizeFromCGSize(CGSizeMake(videoWidth,   videoHeight))];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            @autoreleasepool {
-                self.imageView.image = image;
-            }
-        });
+                                                     size:size];
         CGImageRelease(imageRef);
         CGColorSpaceRelease(colorSpaceRef);
         CGDataProviderRelease(provider);
         CFRelease(data);
         free(bytes);
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            @autoreleasepool {
+                self.imageView.image = image;
+            }
+        });
+        
     });
 }
 - (AVPixelFormat)piexlFormat {

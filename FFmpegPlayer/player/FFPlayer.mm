@@ -26,7 +26,7 @@
 }
 
 #pragma mark -
-- (BOOL)_setupPlayer:(const char *)url {
+- (BOOL)setupPlayer:(const char *)url {
     BOOL ret = [_engine setup:url];
     if(!ret) return NO;
     
@@ -37,7 +37,7 @@
 
 #pragma mark - Public
 - (BOOL)playWithUrl:(NSString *)url {
-    if(![self _setupPlayer:[url UTF8String]]) {
+    if(![self setupPlayer:[url UTF8String]]) {
         return NO;
     }
     return YES;

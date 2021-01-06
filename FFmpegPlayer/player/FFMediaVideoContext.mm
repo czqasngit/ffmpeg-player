@@ -94,12 +94,13 @@ fail:
 }
 - (AVFrame *)decodePacket:(AVPacket *)packet {
     int ret = avcodec_send_packet(self.codecContext, packet);
+    av_frame_unref(self->frame);
     if(ret == 0) {
-        av_frame_unref(self->frame);
         ret = avcodec_receive_frame(self.codecContext, self->frame);
         if(ret == 0) {
             av_frame_unref(outputFrame);
-            [self.filter transformFormatWithInputFrame:self->frame outputFrame:&outputFrame];
+            [self.filter getTargetFMTWithInputFrame:self->frame
+                                        outputFrame:&outputFrame];
             NSLog(@"读取到视频帧:%lld", self->outputFrame->pts);
             return self->outputFrame;
         }

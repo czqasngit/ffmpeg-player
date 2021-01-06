@@ -15,7 +15,12 @@ extern "C" {
 NS_ASSUME_NONNULL_BEGIN
 
 @interface FFMediaVideoContext : NSObject
-@property(nonatomic, assign)NSInteger streamIndex;
+@property(nonatomic, assign, readonly)NSInteger streamIndex;
+
+/// 初始化VideoContext
+/// @param stream 视频流AVStream
+/// @param formatContext AVFormatContext
+/// @param fmt 需要显示的目标视频格式
 - (instancetype)initWithAVStream:(AVStream *)stream
                    formatContext:(nonnull AVFormatContext *)formatContext
                              fmt:(AVPixelFormat)fmt;

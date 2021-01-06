@@ -19,17 +19,8 @@
 @end
 @implementation FFEngine {
     AVFormatContext *formatContext;
-    dispatch_queue_t _decode_queue;
+    dispatch_queue_t decode_queue;
     AVPacket *packet;
-}
-
-- (instancetype)initWithVideoRender:(id<FFVideoRender>)videoRender {
-    self = [super init];
-    if (self) {
-        self.videoRender = videoRender;
-        _decode_queue = dispatch_queue_create("decode queue", DISPATCH_QUEUE_SERIAL);
-    }
-    return self;
 }
 - (void)dealloc {
     if(formatContext) {
@@ -40,6 +31,15 @@
         av_packet_unref(packet);
         av_packet_free(&packet);
     }
+}
+- (instancetype)initWithVideoRender:(id<FFVideoRender>)videoRender {
+    self = [super init];
+    if (self) {
+        self.videoRender = videoRender;
+        decode_queue = dispatch_queue_create("decode queue", DISPATCH_QUEUE_SERIAL);
+        packet = av_packet_alloc();
+    }
+    return self;
 }
 - (BOOL)setup:(const char *)url {
     /// formatContet: AVFormatContext,保存了音视频文件信息
@@ -54,18 +54,18 @@
     ret = avformat_find_stream_info(formatContext, NULL);
     if(ret < 0) goto fail;
     if(formatContext->nb_streams == 0) goto fail;
-    for(int i = 0; i < formatContext->nb_streams; i ++) {
-        AVStream *stream = formatContext->streams[i];
-        AVMediaType mediaType = stream->codecpar->codec_type;
-        if(mediaType == AVMEDIA_TYPE_VIDEO) {
-            _mediaVideo = [[FFMediaVideoContext alloc] initWithAVStream:stream formatContext:formatContext fmt:[self.videoRender piexlFormat]];
-            if(!_mediaVideo) goto fail;
-        } else if(mediaType == AVMEDIA_TYPE_AUDIO) {
-            _mediaAudio = [[FFMediaAudioContext alloc] initWithAVStream:stream formatContext:formatContext];
-            if(!_mediaAudio) goto fail;
-        }
+    if(![self setupMediaContext]) goto fail;
+    [self resetTimer];
+    return YES;
+fail:
+    if(formatContext) {
+        avformat_close_input(&formatContext);
     }
-    self->packet = av_packet_alloc();
+    return NO;
+}
+
+#pragma mark -
+- (void)resetTimer {
     if(self.displayTimer) {
         [self.displayTimer invalidate];
         self.displayTimer = NULL;
@@ -75,17 +75,28 @@
                                                        selector:@selector(displayNextFrame)
                                                        userInfo:NULL
                                                         repeats:YES];
-    return YES;
-fail:
-    if(formatContext) {
-        avformat_close_input(&formatContext);
+}
+- (BOOL)setupMediaContext {
+    for(int i = 0; i < formatContext->nb_streams; i ++) {
+        AVStream *stream = formatContext->streams[i];
+        AVMediaType mediaType = stream->codecpar->codec_type;
+        if(mediaType == AVMEDIA_TYPE_VIDEO) {
+            _mediaVideo = [[FFMediaVideoContext alloc] initWithAVStream:stream
+                                                          formatContext:formatContext
+                                                                    fmt:[self.videoRender piexlFormat]];
+            if(!_mediaVideo) return NO;
+        } else if(mediaType == AVMEDIA_TYPE_AUDIO) {
+            _mediaAudio = [[FFMediaAudioContext alloc] initWithAVStream:stream formatContext:formatContext];
+            if(!_mediaAudio) return NO;
+        }
     }
-    return NO;
+    return YES;
 }
 
 #pragma mark - Private
 - (void)displayNextFrame {
-    dispatch_async(_decode_queue, ^{
+    dispatch_async(decode_queue, ^{
+        /// 在不关心音频,只展示视频图像的时候使用stop来跳过音视帧
         bool stop = false;
         while (!stop) {
             av_packet_unref(self->packet);
@@ -97,8 +108,6 @@ fail:
                         stop = YES;
                     }
                 }
-            } else {
-                av_packet_unref(self->packet);
             }
         }
     });

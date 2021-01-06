@@ -160,7 +160,7 @@ success:
     return YES;
 }
 
-- (BOOL)transformFormatWithInputFrame:(AVFrame *)inputFrame outputFrame:(AVFrame **)outputFrame {
+- (BOOL)getTargetFMTWithInputFrame:(AVFrame *)inputFrame outputFrame:(AVFrame **)outputFrame {
     int ret = av_buffersrc_add_frame(bufferContext, inputFrame);
     if(ret < 0) {
         NSLog(@"add frame to buffersrc failed.");
