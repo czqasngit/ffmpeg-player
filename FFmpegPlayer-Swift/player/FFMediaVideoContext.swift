@@ -71,8 +71,10 @@ extension FFMediaVideoContext {
     public func decode(packet: UnsafeMutablePointer<AVPacket>) -> UnsafeMutablePointer<AVFrame>? {
         var ret = avcodec_send_packet(codecContext, packet)
         guard ret == 0 else { return nil }
+        av_frame_unref(frame)
         ret = avcodec_receive_frame(codecContext, frame)
         guard ret == 0 else { return nil }
+        av_frame_unref(outputFrame)
         guard filter.getTargetFMT(inputFrame: frame!, outputFrame: &(outputFrame!)) else { return nil }
         return outputFrame
     }
