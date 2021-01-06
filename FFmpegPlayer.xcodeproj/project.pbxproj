@@ -65,6 +65,9 @@
 		A09F446725A34046001E4BCA /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = A09F433B25A2FA96001E4BCA /* libz.tbd */; };
 		A09F447225A464D8001E4BCA /* FFRGBRender.mm in Sources */ = {isa = PBXBuildFile; fileRef = A09F447125A464D8001E4BCA /* FFRGBRender.mm */; };
 		A09F447C25A4660B001E4BCA /* FFFilter.mm in Sources */ = {isa = PBXBuildFile; fileRef = A09F447B25A4660B001E4BCA /* FFFilter.mm */; };
+		A09F449225A553DD001E4BCA /* FFFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A09F449125A553DD001E4BCA /* FFFilter.swift */; };
+		A09F449725A560EB001E4BCA /* FFVideoRender.swift in Sources */ = {isa = PBXBuildFile; fileRef = A09F449625A560EB001E4BCA /* FFVideoRender.swift */; };
+		A09F449B25A5615B001E4BCA /* FFRGBRender.swift in Sources */ = {isa = PBXBuildFile; fileRef = A09F449A25A5615B001E4BCA /* FFRGBRender.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -249,6 +252,9 @@
 		A09F447525A4651D001E4BCA /* FFVideoRender.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FFVideoRender.h; sourceTree = "<group>"; };
 		A09F447A25A4660B001E4BCA /* FFFilter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FFFilter.h; sourceTree = "<group>"; };
 		A09F447B25A4660B001E4BCA /* FFFilter.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FFFilter.mm; sourceTree = "<group>"; };
+		A09F449125A553DD001E4BCA /* FFFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FFFilter.swift; sourceTree = "<group>"; };
+		A09F449625A560EB001E4BCA /* FFVideoRender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FFVideoRender.swift; sourceTree = "<group>"; };
+		A09F449A25A5615B001E4BCA /* FFRGBRender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FFRGBRender.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -625,10 +631,12 @@
 		A09F436525A3016F001E4BCA /* player */ = {
 			isa = PBXGroup;
 			children = (
+				A09F449525A560D6001E4BCA /* video */,
 				A09F436625A30181001E4BCA /* FFPlayer.swift */,
 				A09F444C25A33F31001E4BCA /* FFEngine.swift */,
 				A09F445025A33F48001E4BCA /* FFMediaVideoContext.swift */,
 				A09F445425A33F58001E4BCA /* FFMediaAudioContext.swift */,
+				A09F449125A553DD001E4BCA /* FFFilter.swift */,
 			);
 			path = player;
 			sourceTree = "<group>";
@@ -665,6 +673,15 @@
 			children = (
 			);
 			path = Audio;
+			sourceTree = "<group>";
+		};
+		A09F449525A560D6001E4BCA /* video */ = {
+			isa = PBXGroup;
+			children = (
+				A09F449625A560EB001E4BCA /* FFVideoRender.swift */,
+				A09F449A25A5615B001E4BCA /* FFRGBRender.swift */,
+			);
+			path = video;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -788,9 +805,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				A09F425E25A2B8A5001E4BCA /* ViewController.swift in Sources */,
+				A09F449725A560EB001E4BCA /* FFVideoRender.swift in Sources */,
 				A09F436725A30181001E4BCA /* FFPlayer.swift in Sources */,
 				A09F425C25A2B8A5001E4BCA /* AppDelegate.swift in Sources */,
+				A09F449B25A5615B001E4BCA /* FFRGBRender.swift in Sources */,
 				A09F445125A33F48001E4BCA /* FFMediaVideoContext.swift in Sources */,
+				A09F449225A553DD001E4BCA /* FFFilter.swift in Sources */,
 				A09F444D25A33F31001E4BCA /* FFEngine.swift in Sources */,
 				A09F445525A33F58001E4BCA /* FFMediaAudioContext.swift in Sources */,
 			);

@@ -44,7 +44,7 @@
     int videoHeight = rgbFrame->height;
     int videoWidth = rgbFrame->width;
     int len = (linesize * videoHeight);
-    UInt8 *bytes = (UInt8 *)malloc(len * sizeof(UInt8));
+    UInt8 *bytes = (UInt8 *)malloc(len);
     memcpy(bytes, rgbFrame->data[0], len);
     dispatch_async(display_rgb_queue, ^{
         CFDataRef data = CFDataCreateWithBytesNoCopy(kCFAllocatorDefault, bytes, len, kCFAllocatorNull);

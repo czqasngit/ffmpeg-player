@@ -50,6 +50,8 @@ static void av_print_obj_all_options(void *obj) {
 
 - (void)dealloc {
     if(graph) avfilter_graph_free(&graph);
+    if(bufferContext) avfilter_free(bufferContext);
+    if(bufferSinkContext) avfilter_free(bufferSinkContext);
 }
 - (instancetype)initWithCodecContext:(AVCodecContext *)codecContext
                        formatContext:(AVFormatContext *)formatContext
@@ -75,7 +77,6 @@ static void av_print_obj_all_options(void *obj) {
     const AVFilter *bufferSink = avfilter_get_by_name("buffersink");
     int ret = 0;
     enum AVPixelFormat format[] = {self->outputFmt};  //想要转换的格式
-    
     if(!buffer || !bufferSink) {
         NSLog(@"get buffer and buffersink filter failed.");
         goto fail;
@@ -110,7 +111,7 @@ static void av_print_obj_all_options(void *obj) {
      */
     /// 这里的pix_fmts不能通过字符串的形式初始化,因为他的类型是一个AV_OPT_TYPE_BINARY
     /// 设置buffersink出口的数据格式是RGB24
-    ret = av_opt_set_bin(bufferSinkContext, "pix_fmts", (uint8_t *)&format, sizeof(AV_PIX_FMT_RGB24), AV_OPT_SEARCH_CHILDREN);
+    ret = av_opt_set_bin(bufferSinkContext, "pix_fmts", (uint8_t *)&format, sizeof(self->outputFmt), AV_OPT_SEARCH_CHILDREN);
     if (ret < 0) {
         NSLog(@"Set pix_fmts value to buffersink class error.");
         goto fail;
@@ -140,7 +141,7 @@ static void av_print_obj_all_options(void *obj) {
     ret = avfilter_graph_parse_ptr(graph, "null", &inputs, &outputs, NULL);
     if(ret < 0) {
         NSLog(@"add filter inputs/outputs to graph failed.");
-        goto success;
+        goto fail;
     }
     ret = avfilter_graph_config(graph, NULL);
     if(ret < 0) {

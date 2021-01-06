@@ -11,20 +11,28 @@ class FFMediaVideoContext {
     
     private let stream: UnsafeMutablePointer<AVStream>!
     private let formatContext: UnsafeMutablePointer<AVFormatContext>!
+    private let fmt: AVPixelFormat
+    private var frame = av_frame_alloc()
+    private var outputFrame = av_frame_alloc()
+    private var filter: FFFilter!
+    
     private var codec: UnsafeMutablePointer<AVCodec>!
     private var codecContext: UnsafeMutablePointer<AVCodecContext>!
-    
     deinit {
         if(self.codecContext != nil) {
             avcodec_close(self.codecContext)
             avcodec_free_context(&codecContext)
         }
+        av_frame_free(&frame)
+        av_frame_free(&outputFrame)
     }
     public init?(stream: UnsafeMutablePointer<AVStream>?,
-                 formatContext: UnsafeMutablePointer<AVFormatContext>?) {
+                 formatContext: UnsafeMutablePointer<AVFormatContext>?,
+                 fmt: AVPixelFormat) {
         guard let stream = stream, let formatContext = formatContext else { return nil }
         self.stream = stream
         self.formatContext = formatContext
+        self.fmt = fmt
         if(!setup()) { return nil }
     }
     // MARK: -
@@ -44,10 +52,28 @@ class FFMediaVideoContext {
         print("Size: (\(self.codecContext.pointee.width), \(self.codecContext.pointee.height))");
         print("Decodec: \(String.init(cString: self.codec.pointee.long_name))");
         print("=========================================================");
+        
+        guard let filter = FFFilter.init(formatContext: formatContext,
+                                    codecContext: codecContext,
+                                    stream: stream,
+                                    fmt: fmt) else {
+            return false
+        }
+        self.filter = filter
+        
         return true
     }
 }
 
 extension FFMediaVideoContext {
-    public var streamIndex: Int { return Int(self.stream.pointee.index) }
+    public var streamIndex: Int { Int(self.stream.pointee.index) }
+    public var fps: Double { av_q2d(self.stream.pointee.avg_frame_rate) }
+    public func decode(packet: UnsafeMutablePointer<AVPacket>) -> UnsafeMutablePointer<AVFrame>? {
+        var ret = avcodec_send_packet(codecContext, packet)
+        guard ret == 0 else { return nil }
+        ret = avcodec_receive_frame(codecContext, frame)
+        guard ret == 0 else { return nil }
+        guard filter.getTargetFMT(inputFrame: frame!, outputFrame: &(outputFrame!)) else { return nil }
+        return outputFrame
+    }
 }
