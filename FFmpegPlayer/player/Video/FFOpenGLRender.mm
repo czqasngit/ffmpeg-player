@@ -47,7 +47,8 @@
 #pragma mark - Private
 - (NSOpenGLContext *)_createOpenGLContext {
     NSOpenGLPixelFormatAttribute attr[] = {
-        NSOpenGLPFAOpenGLProfile, NSOpenGLProfileVersion3_2Core,
+        NSOpenGLPFAOpenGLProfile,
+        NSOpenGLProfileVersion3_2Core,
         NSOpenGLPFANoRecovery,
         NSOpenGLPFAAccelerated,
         NSOpenGLPFADoubleBuffer,

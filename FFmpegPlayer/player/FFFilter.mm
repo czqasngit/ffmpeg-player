@@ -166,10 +166,6 @@ success:
     if(!graph) {
         if(![self setup:(enum AVPixelFormat)inputFrame->format]) return false;
     }
-    if(inputFrame->format == self->fmt) {
-        av_frame_copy(*outputFrame, inputFrame);
-        return YES;
-    }
     int ret = av_buffersrc_add_frame(bufferContext, inputFrame);
     if(ret < 0) {
         NSLog(@"add frame to buffersrc failed.");

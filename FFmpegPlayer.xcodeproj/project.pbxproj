@@ -10,6 +10,9 @@
 		A0286A6825A830B100ACBD99 /* FFOpenGLRender.mm in Sources */ = {isa = PBXBuildFile; fileRef = A0286A6725A830B100ACBD99 /* FFOpenGLRender.mm */; };
 		A0286A7425A8316200ACBD99 /* yuv_fragment.glsl in Resources */ = {isa = PBXBuildFile; fileRef = A0286A7225A8316100ACBD99 /* yuv_fragment.glsl */; };
 		A0286A7525A8316200ACBD99 /* vertex.glsl in Resources */ = {isa = PBXBuildFile; fileRef = A0286A7325A8316200ACBD99 /* vertex.glsl */; };
+		A0286A7825A831E900ACBD99 /* yuv_fragment.glsl in Resources */ = {isa = PBXBuildFile; fileRef = A0286A7225A8316100ACBD99 /* yuv_fragment.glsl */; };
+		A0286A7925A831E900ACBD99 /* vertex.glsl in Resources */ = {isa = PBXBuildFile; fileRef = A0286A7325A8316200ACBD99 /* vertex.glsl */; };
+		A0286A7D25A831FF00ACBD99 /* FFOpenGLRender.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0286A7C25A831FF00ACBD99 /* FFOpenGLRender.swift */; };
 		A09F424225A2B877001E4BCA /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = A09F424125A2B877001E4BCA /* AppDelegate.m */; };
 		A09F424525A2B877001E4BCA /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A09F424425A2B877001E4BCA /* ViewController.m */; };
 		A09F424725A2B878001E4BCA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A09F424625A2B878001E4BCA /* Assets.xcassets */; };
@@ -78,6 +81,7 @@
 		A0286A6725A830B100ACBD99 /* FFOpenGLRender.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = FFOpenGLRender.mm; sourceTree = "<group>"; };
 		A0286A7225A8316100ACBD99 /* yuv_fragment.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = yuv_fragment.glsl; sourceTree = "<group>"; };
 		A0286A7325A8316200ACBD99 /* vertex.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = vertex.glsl; sourceTree = "<group>"; };
+		A0286A7C25A831FF00ACBD99 /* FFOpenGLRender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FFOpenGLRender.swift; sourceTree = "<group>"; };
 		A09F423D25A2B877001E4BCA /* FFmpegPlayer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FFmpegPlayer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A09F424025A2B877001E4BCA /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		A09F424125A2B877001E4BCA /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -660,6 +664,7 @@
 		A09F437325A3073B001E4BCA /* resources */ = {
 			isa = PBXGroup;
 			children = (
+				A0286A7125A8315A00ACBD99 /* glsl */,
 				A09F437925A30758001E4BCA /* audio.mp3 */,
 				A09F437425A3074D001E4BCA /* 1280x720.mp4 */,
 			);
@@ -677,7 +682,6 @@
 		A09F446E25A46203001E4BCA /* Video */ = {
 			isa = PBXGroup;
 			children = (
-				A0286A7125A8315A00ACBD99 /* glsl */,
 				A0286A6625A830B100ACBD99 /* FFOpenGLRender.h */,
 				A0286A6725A830B100ACBD99 /* FFOpenGLRender.mm */,
 				A09F447025A464D8001E4BCA /* FFRGBRender.h */,
@@ -699,6 +703,7 @@
 			children = (
 				A09F449625A560EB001E4BCA /* FFVideoRender.swift */,
 				A09F449A25A5615B001E4BCA /* FFRGBRender.swift */,
+				A0286A7C25A831FF00ACBD99 /* FFOpenGLRender.swift */,
 			);
 			path = video;
 			sourceTree = "<group>";
@@ -795,8 +800,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A0286A7825A831E900ACBD99 /* yuv_fragment.glsl in Resources */,
 				A09F437625A3074D001E4BCA /* 1280x720.mp4 in Resources */,
 				A09F426025A2B8A6001E4BCA /* Assets.xcassets in Resources */,
+				A0286A7925A831E900ACBD99 /* vertex.glsl in Resources */,
 				A09F426325A2B8A6001E4BCA /* Main.storyboard in Resources */,
 				A09F437B25A30758001E4BCA /* audio.mp3 in Resources */,
 			);
@@ -832,6 +839,7 @@
 				A09F425C25A2B8A5001E4BCA /* AppDelegate.swift in Sources */,
 				A09F449B25A5615B001E4BCA /* FFRGBRender.swift in Sources */,
 				A09F445125A33F48001E4BCA /* FFMediaVideoContext.swift in Sources */,
+				A0286A7D25A831FF00ACBD99 /* FFOpenGLRender.swift in Sources */,
 				A09F449225A553DD001E4BCA /* FFFilter.swift in Sources */,
 				A09F444D25A33F31001E4BCA /* FFEngine.swift in Sources */,
 				A09F445525A33F58001E4BCA /* FFMediaAudioContext.swift in Sources */,
@@ -906,6 +914,7 @@
 					"$(inherited)",
 				);
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = NO;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
@@ -959,6 +968,7 @@
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = NO;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
@@ -976,6 +986,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = NO;
 				CODE_SIGN_ENTITLEMENTS = FFmpegPlayer/FFmpegPlayer.entitlements;
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -1003,6 +1014,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = NO;
 				CODE_SIGN_ENTITLEMENTS = FFmpegPlayer/FFmpegPlayer.entitlements;
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -1031,11 +1043,17 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_MODULES = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = NO;
 				CODE_SIGN_ENTITLEMENTS = "FFmpegPlayer-Swift/FFmpegPlayer_Swift.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = 94PTZQZQ2P;
 				ENABLE_HARDENED_RUNTIME = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+					GL_SILENCE_DEPRECATION,
+				);
 				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = NO;
 				HEADER_SEARCH_PATHS = "${SRCROOT}/vender/ffmpeg/include";
 				INFOPLIST_FILE = "FFmpegPlayer-Swift/Info.plist";
@@ -1047,6 +1065,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/vender/ffmpeg/lib",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.jd.FFmpegPlayer-Swift";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
@@ -1062,6 +1081,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_MODULES = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = NO;
 				CODE_SIGN_ENTITLEMENTS = "FFmpegPlayer-Swift/FFmpegPlayer_Swift.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -1078,6 +1098,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/vender/ffmpeg/lib",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.jd.FFmpegPlayer-Swift";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_COMPILATION_MODE = wholemodule;

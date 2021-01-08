@@ -8,3 +8,6 @@
 #include <libavfilter/buffersrc.h>
 #include <libavfilter/buffersink.h>
 #include <libavutil/opt.h>
+
+#define GL_SILENCE_DEPRECATION
+#include <OpenGL/gl3.h>

@@ -1,5 +1,4 @@
 #version 410
-
 out vec4 FragColor;
 in vec2 outTextPos;
 uniform sampler2D yTexture;

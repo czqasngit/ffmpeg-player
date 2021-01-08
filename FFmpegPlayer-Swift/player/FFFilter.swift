@@ -92,12 +92,9 @@ extension FFFilter {
     public func getTargetFormatFrame(inputFrame: UnsafeMutablePointer<AVFrame>,
                                      outputFrame:UnsafeMutablePointer<UnsafeMutablePointer<AVFrame>>) -> Bool {
         if bufferContext == nil {
-            guard setup(format: AVPixelFormat(rawValue: inputFrame.pointee.format)) else { return false }
-        }
-
-        guard inputFrame.pointee.format != self.fmt.rawValue else {
-            av_frame_copy(outputFrame.pointee, inputFrame)
-            return true
+            guard setup(format: AVPixelFormat(rawValue: inputFrame.pointee.format)) else {
+                return false
+            }
         }
         var ret = av_buffersrc_add_frame(bufferContext, inputFrame)
         guard ret == 0 else { return false }
