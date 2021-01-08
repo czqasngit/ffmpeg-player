@@ -25,7 +25,7 @@ class FFEngine {
         self.render = render
     }
     
-    private func setupMediaContext() -> Bool {
+    private func setupMediaContext(enableHWDecode: Bool) -> Bool {
         let streamCount = formatContext.pointee.nb_streams
         for i in 0..<streamCount {
             let stream = formatContext.pointee.streams.advanced(by: Int(i)).pointee!
@@ -33,7 +33,8 @@ class FFEngine {
             if mediaType == AVMEDIA_TYPE_VIDEO {
                 guard let vc = FFMediaVideoContext.init(stream: stream,
                                                         formatContext: formatContext,
-                                                        fmt: self.render.pixFMT) else {
+                                                        fmt: self.render.pixFMT,
+                                                        enableHWDecode: enableHWDecode) else {
                     avformat_close_input(&formatContext)
                     return false
                 }
@@ -60,7 +61,7 @@ class FFEngine {
                                                 repeats: true)
     }
     // MARK: -
-    public func setup(url: String) -> Bool {
+    public func setup(url: String, enableHWDecode: Bool) -> Bool {
         guard let path = (url as NSString).utf8String else { return false }
         var ret = avformat_open_input(&formatContext, path, nil, nil)
         guard ret == 0 && formatContext != nil else { return false }
@@ -71,7 +72,7 @@ class FFEngine {
         }
         let streamCount = formatContext.pointee.nb_streams
         guard  streamCount > 0 else { return false }
-        guard setupMediaContext() else { return false }
+        guard setupMediaContext(enableHWDecode: enableHWDecode) else { return false }
         self.startDecodeTimer()
         return true;
     }

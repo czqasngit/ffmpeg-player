@@ -35,10 +35,9 @@ class FFFilter {
         self.stream = stream
         self.fmt = fmt;
         self.graph = avfilter_graph_alloc()
-        guard setup() else { return nil }
     }
     
-    private func setup() -> Bool {
+    private func setup(format: AVPixelFormat) -> Bool {
         var inputs = avfilter_inout_alloc()
         var outputs = avfilter_inout_alloc()
         defer {
@@ -52,7 +51,7 @@ class FFFilter {
         _ = snprintf(ptr: args, 512, "video_size=%dx%d:pix_fmt=%d:time_base=%d/%d:pixel_aspect=%d/%d",
                  codecContext.pointee.width,
                  codecContext.pointee.height,
-                 codecContext.pointee.pix_fmt.rawValue,
+                 format.rawValue,
                  time_base.num,
                  time_base.den,
                  codecContext.pointee.sample_aspect_ratio.num,
@@ -92,6 +91,10 @@ class FFFilter {
 extension FFFilter {
     public func getTargetFormatFrame(inputFrame: UnsafeMutablePointer<AVFrame>,
                                      outputFrame:UnsafeMutablePointer<UnsafeMutablePointer<AVFrame>>) -> Bool {
+        if bufferContext == nil {
+            guard setup(format: AVPixelFormat(rawValue: inputFrame.pointee.format)) else { return false }
+        }
+
         guard inputFrame.pointee.format != self.fmt.rawValue else {
             av_frame_copy(outputFrame.pointee, inputFrame)
             return true

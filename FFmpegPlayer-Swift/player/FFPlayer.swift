@@ -16,8 +16,8 @@ class FFPlayer {
     init() {
         self.engine = FFEngine.init(render: render)
     }
-    public func play(url: String) -> Bool {
-        guard engine.setup(url: url) else { return false }
+    public func play(url: String, enableHWDecode: Bool) -> Bool {
+        guard engine.setup(url: url, enableHWDecode: enableHWDecode) else { return false }
 
         return true;
     }

@@ -13,13 +13,16 @@ class FFMediaVideoContext {
     private let formatContext: UnsafeMutablePointer<AVFormatContext>!
     private let fmt: AVPixelFormat
     private var frame = av_frame_alloc()
+    private var hwFrame: UnsafeMutablePointer<AVFrame>!
     private var outputFrame = av_frame_alloc()
     private var filter: FFFilter!
     
     private var codec: UnsafeMutablePointer<AVCodec>!
     private var codecContext: UnsafeMutablePointer<AVCodecContext>!
+    private var hwDeviceContext: UnsafeMutablePointer<AVBufferRef>!
+    
     deinit {
-        if(self.codecContext != nil) {
+        if self.codecContext != nil {
             avcodec_close(self.codecContext)
             avcodec_free_context(&codecContext)
         }
@@ -27,18 +30,23 @@ class FFMediaVideoContext {
         av_frame_free(&frame)
         av_frame_unref(outputFrame);
         av_frame_free(&outputFrame)
+        if self.hwFrame != nil {
+            av_frame_unref(self.hwFrame)
+            av_frame_free(&hwFrame)
+        }
     }
     public init?(stream: UnsafeMutablePointer<AVStream>?,
                  formatContext: UnsafeMutablePointer<AVFormatContext>?,
-                 fmt: AVPixelFormat) {
+                 fmt: AVPixelFormat,
+                 enableHWDecode: Bool) {
         guard let stream = stream, let formatContext = formatContext else { return nil }
         self.stream = stream
         self.formatContext = formatContext
         self.fmt = fmt
-        if(!setup()) { return nil }
+        if(!setup(enableHWDeocde: enableHWDecode)) { return nil }
     }
     // MARK: -
-    private func setup() -> Bool {
+    private func setup(enableHWDeocde: Bool) -> Bool {
         guard let codecpar = self.stream.pointee.codecpar else { return false }
         guard let codecPointer = avcodec_find_decoder(codecpar.pointee.codec_id) else { return false }
         self.codec = codecPointer
@@ -46,6 +54,26 @@ class FFMediaVideoContext {
         self.codecContext = codecContextPointer
         var ret = avcodec_parameters_to_context(self.codecContext, codecpar)
         guard ret >= 0 else { return false }
+        if enableHWDeocde {
+            var supportVideoToolBoxHWDeocde = false
+            var index: Int32 = 0
+            while true {
+                guard let config = avcodec_get_hw_config(self.codec, index) else {
+                    break
+                }
+                if config.pointee.device_type == AV_HWDEVICE_TYPE_VIDEOTOOLBOX  {
+                    supportVideoToolBoxHWDeocde = true
+                    break
+                }
+                index += 1
+            }
+            if supportVideoToolBoxHWDeocde {
+                ret = av_hwdevice_ctx_create(&hwDeviceContext, AV_HWDEVICE_TYPE_VIDEOTOOLBOX, nil, nil, 0)
+                guard ret == 0 else { return false }
+                codecContext.pointee.hw_device_ctx = hwDeviceContext
+                self.hwFrame = av_frame_alloc()
+            }
+        }
         ret = avcodec_open2(self.codecContext, self.codec, nil)
         guard ret == 0 else { return false }
         print("=================== Video Information ===================");
@@ -74,10 +102,19 @@ extension FFMediaVideoContext {
         var ret = avcodec_send_packet(codecContext, packet)
         guard ret == 0 else { return nil }
         av_frame_unref(frame)
-        ret = avcodec_receive_frame(codecContext, frame)
+        if codecContext.pointee.hw_device_ctx != nil {
+            av_frame_unref(self.hwFrame)
+            ret = avcodec_receive_frame(codecContext, hwFrame)
+            guard ret == 0 else { return nil }
+            ret = av_hwframe_transfer_data(self.frame, self.hwFrame, 0)
+            guard ret == 0 else { return nil }
+        } else {
+            ret = avcodec_receive_frame(codecContext, frame)
+        }
         guard ret == 0 else { return nil }
         av_frame_unref(outputFrame)
         guard filter.getTargetFormatFrame(inputFrame: frame!, outputFrame: &(outputFrame!)) else { return nil }
+        outputFrame!.pointee.pts = packet.pointee.pts
         return outputFrame
     }
 }
