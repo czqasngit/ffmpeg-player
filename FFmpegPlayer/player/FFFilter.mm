@@ -63,12 +63,11 @@ static void av_print_obj_all_options(void *obj) {
         self->formatContext = formatContext;
         self->stream = stream;
         self->fmt = fmt;
-        if(![self setup]) return NULL;
     }
     return self;
 }
 
-- (BOOL)setup {
+- (BOOL)setup:(AVPixelFormat)inputFormat {
     /// 每一个graph都有一个输入与输出,中间连接多个filter
     AVFilterInOut *inputs = avfilter_inout_alloc();
     AVFilterInOut *outputs = avfilter_inout_alloc();
@@ -89,7 +88,7 @@ static void av_print_obj_all_options(void *obj) {
     snprintf(args, sizeof(args), "video_size=%dx%d:pix_fmt=%d:time_base=%d/%d:pixel_aspect=%d/%d",
              codecContext->width,
              codecContext->height,
-             codecContext->pix_fmt,
+             inputFormat,
              time_base.num,
              time_base.den,
              codecContext->sample_aspect_ratio.num,
@@ -162,7 +161,11 @@ success:
     return YES;
 }
 
-- (BOOL)getTargetFormatFrameWithInputFrame:(AVFrame *)inputFrame outputFrame:(AVFrame **)outputFrame {
+- (BOOL)getTargetFormatFrameWithInputFrame:(AVFrame *)inputFrame
+                               outputFrame:(AVFrame **)outputFrame {
+    if(!graph) {
+        if(![self setup:(enum AVPixelFormat)inputFrame->format]) return false;
+    }
     if(inputFrame->format == self->fmt) {
         av_frame_copy(*outputFrame, inputFrame);
         return YES;

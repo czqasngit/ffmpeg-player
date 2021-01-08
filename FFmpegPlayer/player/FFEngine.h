@@ -17,7 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface FFEngine : NSObject
 - (instancetype)initWithVideoRender:(id<FFVideoRender>)videoRender;
-- (BOOL)setup:(const char *)url;
+- (BOOL)setup:(const char *)url enableHWDecode:(BOOL)enableHWDecode;
 
 @end
 

@@ -26,8 +26,8 @@
 }
 
 #pragma mark -
-- (BOOL)setupPlayer:(const char *)url {
-    BOOL ret = [_engine setup:url];
+- (BOOL)setupPlayer:(const char *)url enableHWDecode:(BOOL)enableHWDecode {
+    BOOL ret = [_engine setup:url enableHWDecode:enableHWDecode];
     if(!ret) return NO;
     
     return YES;
@@ -36,8 +36,8 @@
 #pragma mark - Private
 
 #pragma mark - Public
-- (BOOL)playWithUrl:(NSString *)url {
-    if(![self setupPlayer:[url UTF8String]]) {
+- (BOOL)playWithUrl:(NSString *)url enableHWDecode:(BOOL)enableHWDecode {
+    if(![self setupPlayer:[url UTF8String] enableHWDecode:enableHWDecode]) {
         return NO;
     }
     return YES;

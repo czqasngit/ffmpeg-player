@@ -15,6 +15,7 @@ extern "C" {
 NS_ASSUME_NONNULL_BEGIN
 
 @interface FFMediaVideoContext : NSObject
+@property (nonatomic, assign)BOOL enableHWDecode;
 @property(nonatomic, assign, readonly)NSInteger streamIndex;
 
 /// 初始化VideoContext
@@ -23,7 +24,8 @@ NS_ASSUME_NONNULL_BEGIN
 /// @param fmt 需要显示的目标视频格式
 - (instancetype)initWithAVStream:(AVStream *)stream
                    formatContext:(nonnull AVFormatContext *)formatContext
-                             fmt:(AVPixelFormat)fmt;
+                             fmt:(AVPixelFormat)fmt
+                  enableHWDecode:(BOOL)enableHWDecode;
 - (AVCodecContext *)codecContext;
 - (int)fps;
 - (AVFrame *)decodePacket:(AVPacket *)packet;

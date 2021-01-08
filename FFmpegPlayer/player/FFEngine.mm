@@ -41,7 +41,7 @@
     }
     return self;
 }
-- (BOOL)setup:(const char *)url {
+- (BOOL)setup:(const char *)url enableHWDecode:(BOOL)enableHWDecode {
     /// formatContet: AVFormatContext,保存了音视频文件信息
     /// url: 需要打开的音视频文件地址
     /// fmt: 指定打开的音视频文件的格式,如果不指定则自动推导
@@ -54,7 +54,7 @@
     ret = avformat_find_stream_info(formatContext, NULL);
     if(ret < 0) goto fail;
     if(formatContext->nb_streams == 0) goto fail;
-    if(![self setupMediaContext]) goto fail;
+    if(![self setupMediaContextWithEnableHWDecode:enableHWDecode]) goto fail;
     [self resetTimer];
     return YES;
 fail:
@@ -76,14 +76,14 @@ fail:
                                                        userInfo:NULL
                                                         repeats:YES];
 }
-- (BOOL)setupMediaContext {
+- (BOOL)setupMediaContextWithEnableHWDecode:(BOOL)enableHWDecode {
     for(int i = 0; i < formatContext->nb_streams; i ++) {
         AVStream *stream = formatContext->streams[i];
         AVMediaType mediaType = stream->codecpar->codec_type;
         if(mediaType == AVMEDIA_TYPE_VIDEO) {
             _mediaVideo = [[FFMediaVideoContext alloc] initWithAVStream:stream
                                                           formatContext:formatContext
-                                                                    fmt:[self.videoRender piexlFormat]];
+                                                                    fmt:[self.videoRender piexlFormat] enableHWDecode:enableHWDecode];
             if(!_mediaVideo) return NO;
         } else if(mediaType == AVMEDIA_TYPE_AUDIO) {
             _mediaAudio = [[FFMediaAudioContext alloc] initWithAVStream:stream formatContext:formatContext];
@@ -102,7 +102,10 @@ fail:
             av_packet_unref(self->packet);
             if(av_read_frame(self->formatContext, self->packet) >= 0) {
                 if(self->packet->stream_index == self.mediaVideo.streamIndex) {
+                    CFTimeInterval start = CFAbsoluteTimeGetCurrent();
                     AVFrame *frame = [self.mediaVideo decodePacket:self->packet];
+                    CFTimeInterval end = CFAbsoluteTimeGetCurrent();
+//                    NSLog(@"解码时间: %f", end - start);
                     if(frame) {
                         [self.videoRender displayWithAVFrame:frame];
                         stop = YES;
@@ -112,5 +115,7 @@ fail:
         }
     });
 }
+
+#pragma mark - Public
 
 @end
