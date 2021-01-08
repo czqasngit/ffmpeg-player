@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A0286A6825A830B100ACBD99 /* FFOpenGLRender.mm in Sources */ = {isa = PBXBuildFile; fileRef = A0286A6725A830B100ACBD99 /* FFOpenGLRender.mm */; };
+		A0286A7425A8316200ACBD99 /* yuv_fragment.glsl in Resources */ = {isa = PBXBuildFile; fileRef = A0286A7225A8316100ACBD99 /* yuv_fragment.glsl */; };
+		A0286A7525A8316200ACBD99 /* vertex.glsl in Resources */ = {isa = PBXBuildFile; fileRef = A0286A7325A8316200ACBD99 /* vertex.glsl */; };
 		A09F424225A2B877001E4BCA /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = A09F424125A2B877001E4BCA /* AppDelegate.m */; };
 		A09F424525A2B877001E4BCA /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A09F424425A2B877001E4BCA /* ViewController.m */; };
 		A09F424725A2B878001E4BCA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A09F424625A2B878001E4BCA /* Assets.xcassets */; };
@@ -71,6 +74,10 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		A0286A6625A830B100ACBD99 /* FFOpenGLRender.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FFOpenGLRender.h; sourceTree = "<group>"; };
+		A0286A6725A830B100ACBD99 /* FFOpenGLRender.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = FFOpenGLRender.mm; sourceTree = "<group>"; };
+		A0286A7225A8316100ACBD99 /* yuv_fragment.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = yuv_fragment.glsl; sourceTree = "<group>"; };
+		A0286A7325A8316200ACBD99 /* vertex.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = vertex.glsl; sourceTree = "<group>"; };
 		A09F423D25A2B877001E4BCA /* FFmpegPlayer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FFmpegPlayer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A09F424025A2B877001E4BCA /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		A09F424125A2B877001E4BCA /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -310,6 +317,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		A0286A7125A8315A00ACBD99 /* glsl */ = {
+			isa = PBXGroup;
+			children = (
+				A0286A7325A8316200ACBD99 /* vertex.glsl */,
+				A0286A7225A8316100ACBD99 /* yuv_fragment.glsl */,
+			);
+			path = glsl;
+			sourceTree = "<group>";
+		};
 		A09F423425A2B877001E4BCA = {
 			isa = PBXGroup;
 			children = (
@@ -661,6 +677,9 @@
 		A09F446E25A46203001E4BCA /* Video */ = {
 			isa = PBXGroup;
 			children = (
+				A0286A7125A8315A00ACBD99 /* glsl */,
+				A0286A6625A830B100ACBD99 /* FFOpenGLRender.h */,
+				A0286A6725A830B100ACBD99 /* FFOpenGLRender.mm */,
 				A09F447025A464D8001E4BCA /* FFRGBRender.h */,
 				A09F447125A464D8001E4BCA /* FFRGBRender.mm */,
 				A09F447525A4651D001E4BCA /* FFVideoRender.h */,
@@ -763,8 +782,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A0286A7425A8316200ACBD99 /* yuv_fragment.glsl in Resources */,
 				A09F437525A3074D001E4BCA /* 1280x720.mp4 in Resources */,
 				A09F424725A2B878001E4BCA /* Assets.xcassets in Resources */,
+				A0286A7525A8316200ACBD99 /* vertex.glsl in Resources */,
 				A09F424A25A2B879001E4BCA /* Main.storyboard in Resources */,
 				A09F437A25A30758001E4BCA /* audio.mp3 in Resources */,
 			);
@@ -797,6 +818,7 @@
 				A09F447225A464D8001E4BCA /* FFRGBRender.mm in Sources */,
 				A09F424225A2B877001E4BCA /* AppDelegate.m in Sources */,
 				A09F438925A30B7C001E4BCA /* FFMediaAudioContext.mm in Sources */,
+				A0286A6825A830B100ACBD99 /* FFOpenGLRender.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -959,6 +981,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = NO;
+				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = NO;
 				HEADER_SEARCH_PATHS = "${SRCROOT}/vender/ffmpeg/include";
 				INFOPLIST_FILE = FFmpegPlayer/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -985,6 +1008,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = NO;
+				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = NO;
 				HEADER_SEARCH_PATHS = "${SRCROOT}/vender/ffmpeg/include";
 				INFOPLIST_FILE = FFmpegPlayer/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1012,6 +1036,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = 94PTZQZQ2P;
 				ENABLE_HARDENED_RUNTIME = YES;
+				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = NO;
 				HEADER_SEARCH_PATHS = "${SRCROOT}/vender/ffmpeg/include";
 				INFOPLIST_FILE = "FFmpegPlayer-Swift/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1042,6 +1067,7 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = 94PTZQZQ2P;
 				ENABLE_HARDENED_RUNTIME = YES;
+				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = NO;
 				HEADER_SEARCH_PATHS = "${SRCROOT}/vender/ffmpeg/include";
 				INFOPLIST_FILE = "FFmpegPlayer-Swift/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (

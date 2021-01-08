@@ -9,6 +9,7 @@
 #import "FFEngine.h"
 #import "FFRGBRender.h"
 #import "FFVideoRender.h"
+#import "FFOpenGLRender.h"
 
 @interface FFPlayer()
 @property (nonatomic, strong)FFEngine *engine;
@@ -19,7 +20,7 @@
 - (instancetype)init {
     self = [super init];
     if (self) {
-        _videoRender = [[FFRGBRender alloc] init];
+        _videoRender = [[FFOpenGLRender alloc] init];
         _engine = [[FFEngine alloc] initWithVideoRender:self.videoRender];
     }
     return self;

@@ -112,9 +112,9 @@ extension FFMediaVideoContext {
             ret = avcodec_receive_frame(codecContext, frame)
         }
         guard ret == 0 else { return nil }
+        frame!.pointee.pts = packet.pointee.pts
         av_frame_unref(outputFrame)
         guard filter.getTargetFormatFrame(inputFrame: frame!, outputFrame: &(outputFrame!)) else { return nil }
-        outputFrame!.pointee.pts = packet.pointee.pts
         return outputFrame
     }
 }
