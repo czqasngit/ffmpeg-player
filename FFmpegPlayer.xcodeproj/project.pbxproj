@@ -13,6 +13,12 @@
 		A0286A7825A831E900ACBD99 /* yuv_fragment.glsl in Resources */ = {isa = PBXBuildFile; fileRef = A0286A7225A8316100ACBD99 /* yuv_fragment.glsl */; };
 		A0286A7925A831E900ACBD99 /* vertex.glsl in Resources */ = {isa = PBXBuildFile; fileRef = A0286A7325A8316200ACBD99 /* vertex.glsl */; };
 		A0286A7D25A831FF00ACBD99 /* FFOpenGLRender.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0286A7C25A831FF00ACBD99 /* FFOpenGLRender.swift */; };
+		A05BAA2925B06B7400AEC9A4 /* FFMetalRender.mm in Sources */ = {isa = PBXBuildFile; fileRef = A05BAA2725B06B7400AEC9A4 /* FFMetalRender.mm */; };
+		A05BAA2F25B06BFD00AEC9A4 /* MetalKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A05BAA2E25B06BFD00AEC9A4 /* MetalKit.framework */; };
+		A05BAA3325B06C0400AEC9A4 /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A05BAA3225B06C0400AEC9A4 /* Metal.framework */; };
+		A05BAA3825B06CEF00AEC9A4 /* MetalKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A05BAA2E25B06BFD00AEC9A4 /* MetalKit.framework */; };
+		A05BAA3D25B06D9700AEC9A4 /* Shaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = A05BAA3C25B06D9700AEC9A4 /* Shaders.metal */; };
+		A05BAA3E25B06D9700AEC9A4 /* Shaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = A05BAA3C25B06D9700AEC9A4 /* Shaders.metal */; };
 		A09F424225A2B877001E4BCA /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = A09F424125A2B877001E4BCA /* AppDelegate.m */; };
 		A09F424525A2B877001E4BCA /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A09F424425A2B877001E4BCA /* ViewController.m */; };
 		A09F424725A2B878001E4BCA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A09F424625A2B878001E4BCA /* Assets.xcassets */; };
@@ -82,6 +88,11 @@
 		A0286A7225A8316100ACBD99 /* yuv_fragment.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = yuv_fragment.glsl; sourceTree = "<group>"; };
 		A0286A7325A8316200ACBD99 /* vertex.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = vertex.glsl; sourceTree = "<group>"; };
 		A0286A7C25A831FF00ACBD99 /* FFOpenGLRender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FFOpenGLRender.swift; sourceTree = "<group>"; };
+		A05BAA2725B06B7400AEC9A4 /* FFMetalRender.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = FFMetalRender.mm; sourceTree = "<group>"; };
+		A05BAA2825B06B7400AEC9A4 /* FFMetalRender.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FFMetalRender.h; sourceTree = "<group>"; };
+		A05BAA2E25B06BFD00AEC9A4 /* MetalKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MetalKit.framework; path = System/Library/Frameworks/MetalKit.framework; sourceTree = SDKROOT; };
+		A05BAA3225B06C0400AEC9A4 /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = System/Library/Frameworks/Metal.framework; sourceTree = SDKROOT; };
+		A05BAA3C25B06D9700AEC9A4 /* Shaders.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; path = Shaders.metal; sourceTree = "<group>"; };
 		A09F423D25A2B877001E4BCA /* FFmpegPlayer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FFmpegPlayer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A09F424025A2B877001E4BCA /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		A09F424125A2B877001E4BCA /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -273,6 +284,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A05BAA3825B06CEF00AEC9A4 /* MetalKit.framework in Frameworks */,
 				A09F435D25A2FB0F001E4BCA /* liblzma.tbd in Frameworks */,
 				A09F443825A33E63001E4BCA /* libpostproc.a in Frameworks */,
 				A09F443A25A33E63001E4BCA /* libavcodec.a in Frameworks */,
@@ -298,6 +310,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A05BAA3325B06C0400AEC9A4 /* Metal.framework in Frameworks */,
+				A05BAA2F25B06BFD00AEC9A4 /* MetalKit.framework in Frameworks */,
 				A09F446725A34046001E4BCA /* libz.tbd in Frameworks */,
 				A09F446425A34041001E4BCA /* libbz2.tbd in Frameworks */,
 				A09F446125A3403A001E4BCA /* liblzma.tbd in Frameworks */,
@@ -328,6 +342,14 @@
 				A0286A7225A8316100ACBD99 /* yuv_fragment.glsl */,
 			);
 			path = glsl;
+			sourceTree = "<group>";
+		};
+		A05BAA3B25B06D8F00AEC9A4 /* metal */ = {
+			isa = PBXGroup;
+			children = (
+				A05BAA3C25B06D9700AEC9A4 /* Shaders.metal */,
+			);
+			path = metal;
 			sourceTree = "<group>";
 		};
 		A09F423425A2B877001E4BCA = {
@@ -635,6 +657,8 @@
 		A09F433625A2FA88001E4BCA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				A05BAA3225B06C0400AEC9A4 /* Metal.framework */,
+				A05BAA2E25B06BFD00AEC9A4 /* MetalKit.framework */,
 				A09F435C25A2FB0F001E4BCA /* liblzma.tbd */,
 				A09F435825A2FB08001E4BCA /* libiconv.2.tbd */,
 				A09F434F25A2FAC5001E4BCA /* libbz2.tbd */,
@@ -664,6 +688,7 @@
 		A09F437325A3073B001E4BCA /* resources */ = {
 			isa = PBXGroup;
 			children = (
+				A05BAA3B25B06D8F00AEC9A4 /* metal */,
 				A0286A7125A8315A00ACBD99 /* glsl */,
 				A09F437925A30758001E4BCA /* audio.mp3 */,
 				A09F437425A3074D001E4BCA /* 1280x720.mp4 */,
@@ -682,6 +707,8 @@
 		A09F446E25A46203001E4BCA /* Video */ = {
 			isa = PBXGroup;
 			children = (
+				A05BAA2825B06B7400AEC9A4 /* FFMetalRender.h */,
+				A05BAA2725B06B7400AEC9A4 /* FFMetalRender.mm */,
 				A0286A6625A830B100ACBD99 /* FFOpenGLRender.h */,
 				A0286A6725A830B100ACBD99 /* FFOpenGLRender.mm */,
 				A09F447025A464D8001E4BCA /* FFRGBRender.h */,
@@ -816,6 +843,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A05BAA3D25B06D9700AEC9A4 /* Shaders.metal in Sources */,
 				A09F424525A2B877001E4BCA /* ViewController.m in Sources */,
 				A09F436E25A3045A001E4BCA /* FFEngine.mm in Sources */,
 				A09F424D25A2B879001E4BCA /* main.m in Sources */,
@@ -824,6 +852,7 @@
 				A09F438425A30B70001E4BCA /* FFMediaVideoContext.mm in Sources */,
 				A09F447225A464D8001E4BCA /* FFRGBRender.mm in Sources */,
 				A09F424225A2B877001E4BCA /* AppDelegate.m in Sources */,
+				A05BAA2925B06B7400AEC9A4 /* FFMetalRender.mm in Sources */,
 				A09F438925A30B7C001E4BCA /* FFMediaAudioContext.mm in Sources */,
 				A0286A6825A830B100ACBD99 /* FFOpenGLRender.mm in Sources */,
 			);
@@ -841,6 +870,7 @@
 				A09F445125A33F48001E4BCA /* FFMediaVideoContext.swift in Sources */,
 				A0286A7D25A831FF00ACBD99 /* FFOpenGLRender.swift in Sources */,
 				A09F449225A553DD001E4BCA /* FFFilter.swift in Sources */,
+				A05BAA3E25B06D9700AEC9A4 /* Shaders.metal in Sources */,
 				A09F444D25A33F31001E4BCA /* FFEngine.swift in Sources */,
 				A09F445525A33F58001E4BCA /* FFMediaAudioContext.swift in Sources */,
 			);

@@ -8,7 +8,6 @@
 #import "FFEngine.h"
 #import "FFMediaVideoContext.h"
 #import "FFMediaAudioContext.h"
-
 #import "FFVideoRender.h"
 
 @interface FFEngine()
@@ -102,9 +101,9 @@ fail:
             av_packet_unref(self->packet);
             if(av_read_frame(self->formatContext, self->packet) >= 0) {
                 if(self->packet->stream_index == self.mediaVideo.streamIndex) {
-                    CFTimeInterval start = CFAbsoluteTimeGetCurrent();
+//                    CFTimeInterval start = CFAbsoluteTimeGetCurrent();
                     AVFrame *frame = [self.mediaVideo decodePacket:self->packet];
-                    CFTimeInterval end = CFAbsoluteTimeGetCurrent();
+//                    CFTimeInterval end = CFAbsoluteTimeGetCurrent();
 //                    NSLog(@"解码时间: %f", end - start);
                     if(frame) {
                         [self.videoRender displayWithAVFrame:frame];

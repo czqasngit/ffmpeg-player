@@ -152,13 +152,13 @@ fail:
         if(ret != 0) return NULL;
     }
     CFTimeInterval end = CFAbsoluteTimeGetCurrent();
-    NSLog(@"解码时间: %f", end - start);
+//    NSLog(@"解码时间: %f", end - start);
     if(ret != 0) return NULL;
     av_frame_unref(outputFrame);
     self->frame->pts = packet->pts;
     [self.filter getTargetFormatFrameWithInputFrame:self->frame
                                 outputFrame:&outputFrame];
-    NSLog(@"读取到视频帧:%lld", self->outputFrame->pts);
+//    NSLog(@"读取到视频帧:%lld", self->outputFrame->pts);
     return self->outputFrame;
 }
 @end
