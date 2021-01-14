@@ -24,6 +24,7 @@
     AVFrame *outputFrame;
     AVBufferRef *hwDeviceContext;
     BOOL enableHWDecode;
+    BOOL supportAudioToolBox;
 }
 - (void)dealloc {
     if(self->codecContext) {
@@ -83,7 +84,7 @@
     if(ret < 0) goto fail;
     if(enableHWDecode) {
         int hwConfigIndex = 0;
-        bool supportAudioToolBox = false;
+        supportAudioToolBox = false;
         /// 判断当前解码器是否支持AV_HWDEVICE_TYPE_VIDEOTOOLBOX硬解
         /// 某些视频格式的视频解码器不支持
         while (true) {
@@ -141,7 +142,7 @@ fail:
     int ret = avcodec_send_packet(self.codecContext, packet);
     av_frame_unref(self->hwFrame);
     if(ret != 0) return NULL;
-    if(self.enableHWDecode) {
+    if(self.enableHWDecode && supportAudioToolBox) {
         ret = avcodec_receive_frame(self.codecContext, self->hwFrame);
         if(ret != 0) return NULL;
         av_frame_unref(self->frame);
@@ -151,13 +152,13 @@ fail:
         if(ret != 0) return NULL;
     }
     CFTimeInterval end = CFAbsoluteTimeGetCurrent();
-    NSLog(@"解码时间: %f", end - start);
+//    NSLog(@"解码时间: %f", end - start);
     if(ret != 0) return NULL;
     av_frame_unref(outputFrame);
     self->frame->pts = packet->pts;
     [self.filter getTargetFormatFrameWithInputFrame:self->frame
                                 outputFrame:&outputFrame];
-    NSLog(@"读取到视频帧:%lld", self->outputFrame->pts);
+//    NSLog(@"读取到视频帧:%lld", self->outputFrame->pts);
     return self->outputFrame;
 }
 @end
