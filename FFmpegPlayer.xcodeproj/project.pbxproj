@@ -80,6 +80,7 @@
 		A09F449225A553DD001E4BCA /* FFFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A09F449125A553DD001E4BCA /* FFFilter.swift */; };
 		A09F449725A560EB001E4BCA /* FFVideoRender.swift in Sources */ = {isa = PBXBuildFile; fileRef = A09F449625A560EB001E4BCA /* FFVideoRender.swift */; };
 		A09F449B25A5615B001E4BCA /* FFRGBRender.swift in Sources */ = {isa = PBXBuildFile; fileRef = A09F449A25A5615B001E4BCA /* FFRGBRender.swift */; };
+		BEEF9411522BC4C1B4892145 /* FFMetalRender.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEEF90A8E689CA0F78500E71 /* FFMetalRender.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -277,6 +278,7 @@
 		A09F449125A553DD001E4BCA /* FFFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FFFilter.swift; sourceTree = "<group>"; };
 		A09F449625A560EB001E4BCA /* FFVideoRender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FFVideoRender.swift; sourceTree = "<group>"; };
 		A09F449A25A5615B001E4BCA /* FFRGBRender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FFRGBRender.swift; sourceTree = "<group>"; };
+		BEEF90A8E689CA0F78500E71 /* FFMetalRender.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FFMetalRender.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -731,6 +733,7 @@
 				A09F449625A560EB001E4BCA /* FFVideoRender.swift */,
 				A09F449A25A5615B001E4BCA /* FFRGBRender.swift */,
 				A0286A7C25A831FF00ACBD99 /* FFOpenGLRender.swift */,
+				BEEF90A8E689CA0F78500E71 /* FFMetalRender.swift */,
 			);
 			path = video;
 			sourceTree = "<group>";
@@ -873,6 +876,7 @@
 				A05BAA3E25B06D9700AEC9A4 /* Shaders.metal in Sources */,
 				A09F444D25A33F31001E4BCA /* FFEngine.swift in Sources */,
 				A09F445525A33F58001E4BCA /* FFMediaAudioContext.swift in Sources */,
+				BEEF9411522BC4C1B4892145 /* FFMetalRender.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
