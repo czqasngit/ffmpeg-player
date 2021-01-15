@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/ffmpeg-player.iml" filepath="$PROJECT_DIR$/.idea/ffmpeg-player.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/FFmpegPlayer.iml" filepath="$PROJECT_DIR$/.idea/FFmpegPlayer.iml" />
     </modules>
   </component>
 </project>
