@@ -24,14 +24,14 @@
     self = [super initWithFrame:frame];
     if (self) {
         display_metal_queue = dispatch_queue_create("display metal queue", NULL);
-        [self setupMTL];
+        [self setupMetal];
     }
     return self;
 }
 
 #pragma mark - Private
 
-- (void)setupMTL {
+- (void)setupMetal {
     /// Create GPU Device
     id<MTLDevice> device = MTLCreateSystemDefaultDevice();
     /// Create new command queue that organizes command buffers for the GPU to execute.
@@ -107,8 +107,8 @@
 #pragma mark - Override
 - (void)displayWithAVFrame:(AVFrame *)frame {
     CVPixelBufferRef pixelBuffer = [self createCVPixelBufferFromAVFrame:frame];
+    if(!pixelBuffer) return;
     dispatch_async(display_metal_queue, ^{
-        if(!pixelBuffer) return;
         /// Display AVFrame with Metal
         /// Get Y plane width and height
         size_t yWidth = CVPixelBufferGetWidthOfPlane(pixelBuffer, 0);

@@ -10,7 +10,7 @@ import AppKit
 
 class FFPlayer {
     
-    private let render = FFOpenGLRender.init(frame: .zero)
+    private let render = FFMetalRender.init(frame: .zero)
     private let engine: FFEngine
     
     init() {
