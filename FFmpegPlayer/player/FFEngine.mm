@@ -9,11 +9,13 @@
 #import "FFMediaVideoContext.h"
 #import "FFMediaAudioContext.h"
 #import "FFVideoRender.h"
+#import "FFAudioQueuePlayer.h"
 
 @interface FFEngine()
 @property (nonatomic, strong)FFMediaVideoContext *mediaVideo;
 @property (nonatomic, strong)FFMediaAudioContext *mediaAudio;
 @property (nonatomic, strong)id<FFVideoRender> videoRender;
+@property (nonatomic, strong)FFAudioQueuePlayer *audioPlayer;
 @property (nonatomic, strong)NSTimer *displayTimer;
 @end
 @implementation FFEngine {
@@ -55,6 +57,7 @@
     if(formatContext->nb_streams == 0) goto fail;
     if(![self setupMediaContextWithEnableHWDecode:enableHWDecode]) goto fail;
     [self resetTimer];
+    [self.audioPlayer play];
     return YES;
 fail:
     if(formatContext) {
@@ -86,6 +89,7 @@ fail:
             if(!_mediaVideo) return NO;
         } else if(mediaType == AVMEDIA_TYPE_AUDIO) {
             _mediaAudio = [[FFMediaAudioContext alloc] initWithAVStream:stream formatContext:formatContext];
+            self.audioPlayer = [[FFAudioQueuePlayer alloc] initWithAudioCodecContext:_mediaAudio.codecContext];
             if(!_mediaAudio) return NO;
         }
     }
@@ -96,20 +100,16 @@ fail:
 - (void)displayNextFrame {
     dispatch_async(decode_queue, ^{
         /// 在不关心音频,只展示视频图像的时候使用stop来跳过音视帧
-        bool stop = false;
-        while (!stop) {
-            av_packet_unref(self->packet);
-            if(av_read_frame(self->formatContext, self->packet) >= 0) {
-                if(self->packet->stream_index == self.mediaVideo.streamIndex) {
-//                    CFTimeInterval start = CFAbsoluteTimeGetCurrent();
-                    AVFrame *frame = [self.mediaVideo decodePacket:self->packet];
-//                    CFTimeInterval end = CFAbsoluteTimeGetCurrent();
-//                    NSLog(@"解码时间: %f", end - start);
-                    if(frame) {
-                        [self.videoRender displayWithAVFrame:frame];
-                        stop = YES;
-                    }
-                }
+        av_packet_unref(self->packet);
+        if(av_read_frame(self->formatContext, self->packet) >= 0) {
+            if(self->packet->stream_index == self.mediaVideo.streamIndex) {
+//                AVFrame *frame = [self.mediaVideo decodePacket:self->packet];
+//                if(frame) {
+//                    [self.videoRender displayWithAVFrame:frame];
+//                }
+            } else if(self->packet->stream_index == self.mediaAudio.streamIndex) {
+                AVFrame *frame = [self.mediaAudio decodePacket:self->packet];
+                [self.audioPlayer receiveFrame:frame];
             }
         }
     });

@@ -70,7 +70,6 @@
         pixelBufferAttributes[_CFToString(kCVPixelBufferHeightKey)] = @(frame->height);
         /// bytes per row(alignment)
         pixelBufferAttributes[_CFToString(kCVPixelBufferBytesPerRowAlignmentKey)] = @(frame->linesize[0]);
-//        pixelBufferAttributes[_CFToString(kCVPixelBufferIOSurfacePropertiesKey)] = @{};
         CVReturn cvRet = CVPixelBufferPoolCreate(kCFAllocatorDefault,
                                 NULL,
                                 (__bridge  CFDictionaryRef)pixelBufferAttributes,
@@ -115,7 +114,7 @@
         size_t yHeight = CVPixelBufferGetHeightOfPlane(pixelBuffer, 0);
         CVMetalTextureRef yMetalTexture;
         CVReturn ret = CVMetalTextureCacheCreateTextureFromImage(kCFAllocatorDefault,
-                                                                 metalTextureCache,
+                                                                 self->metalTextureCache,
                                                                  pixelBuffer,
                                                                  NULL,
                                                                  MTLPixelFormatR8Unorm,
@@ -131,7 +130,7 @@
         size_t uvHeight = CVPixelBufferGetHeightOfPlane(pixelBuffer, 1);
         CVMetalTextureRef uvMetalTexture;
         ret = CVMetalTextureCacheCreateTextureFromImage(kCFAllocatorDefault,
-                                                        metalTextureCache,
+                                                        self->metalTextureCache,
                                                         pixelBuffer,
                                                         NULL,
                                                         MTLPixelFormatRG8Unorm,

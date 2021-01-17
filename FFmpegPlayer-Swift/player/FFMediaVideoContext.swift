@@ -115,7 +115,7 @@ extension FFMediaVideoContext {
         frame!.pointee.pts = packet.pointee.pts
         av_frame_unref(outputFrame)
         guard filter.getTargetFormatFrame(inputFrame: frame!, outputFrame: &(outputFrame!)) else { return nil }
-        print("读取到视频帧: \(outputFrame!.pointee.pts)")
+        print("读取到视频帧: \(Double(outputFrame!.pointee.pts) * av_q2d(stream.pointee.time_base))")
         return outputFrame
     }
 }

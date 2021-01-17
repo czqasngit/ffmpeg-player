@@ -15,13 +15,19 @@
     AVCodec *codec;
     AVCodecContext *codecContext;
     int streamIndex;
+    AVFrame *frame;
 }
 
+- (void)dealloc {
+    av_frame_unref(frame);
+    av_frame_free(&frame);
+}
 - (instancetype)initWithAVStream:(AVStream *)stream formatContext:(nonnull AVFormatContext *)formatContext {
     self = [super init];
     if(self) {
         self->stream = stream;
         self->formatContext = formatContext;
+        self->frame = av_frame_alloc();
         if(![self _setup]) {
             return NULL;
         }
@@ -55,5 +61,16 @@ fail:
 #pragma mark - Public
 - (NSInteger)streamIndex {
     return self->stream->index;
+}
+- (AVCodecContext *)codecContext {
+    return self->codecContext;
+}
+- (AVFrame *)decodePacket:(AVPacket *)packet {
+    int ret = avcodec_send_packet(self->codecContext, packet);
+    if(ret != 0) return NULL;
+    av_frame_unref(frame);
+    avcodec_receive_frame(self->codecContext, frame);
+    if(ret != 0) return NULL;
+    return frame;
 }
 @end
