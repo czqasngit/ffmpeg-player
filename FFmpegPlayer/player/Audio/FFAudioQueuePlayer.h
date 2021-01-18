@@ -7,18 +7,21 @@
 
 #import <Foundation/Foundation.h>
 extern "C" {
-#include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
-#include <libswresample/swresample.h>
 }
 #import <AudioToolbox/AudioToolbox.h>
 NS_ASSUME_NONNULL_BEGIN
 
+@protocol FFAudioQueuePlayerDelegate <NSObject>
+- (void)readNextAudioFrame:(AudioQueueBufferRef)aqBuffer;
+@end
 @interface FFAudioQueuePlayer : NSObject
-- (instancetype)initWithAudioCodecContext:(AVCodecContext *)audioCodecContext;
-- (void)receiveFrame:(AVFrame *)frame;
+- (instancetype)initWithBufferSize:(int)bufferSize
+                      sampleFormat:(AVSampleFormat)sampleFormat
+                        sampleRate:(int)sampleRate
+                          delegate:(id<FFAudioQueuePlayerDelegate>)delegate;
+- (void)receiveData:(uint8_t *)data length:(int)length aqBuffer:(AudioQueueBufferRef)aqBuffer;
 - (void)reuseAudioQueueBuffer:(AudioQueueBufferRef)aqBuffer;
-- (void)playNextFrame;
 - (void)play;
 - (void)stop;
 @end

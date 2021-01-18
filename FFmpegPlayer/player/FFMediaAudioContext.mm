@@ -15,22 +15,21 @@
     AVCodec *codec;
     AVCodecContext *codecContext;
     int streamIndex;
-    AVFrame *frame;
+    struct SwrContext *au_convert_ctx;
 }
 
 - (void)dealloc {
-    av_frame_unref(frame);
-    av_frame_free(&frame);
+    if(au_convert_ctx) swr_free(&au_convert_ctx);
 }
 - (instancetype)initWithAVStream:(AVStream *)stream formatContext:(nonnull AVFormatContext *)formatContext {
     self = [super init];
     if(self) {
         self->stream = stream;
         self->formatContext = formatContext;
-        self->frame = av_frame_alloc();
         if(![self _setup]) {
             return NULL;
         }
+        [self initializeSwr];
     }
     return self;
 }
@@ -57,7 +56,19 @@
 fail:
     return NO;
 }
-
+- (void) initializeSwr {
+    /// 重采样成双通道,AV_SAMPLE_FMT_S16数据格式
+    au_convert_ctx = swr_alloc_set_opts(NULL,
+                                        AV_CH_LAYOUT_STEREO,
+                                        AV_SAMPLE_FMT_S16,
+                                        codecContext->sample_rate,
+                                        codecContext->channel_layout,
+                                        codecContext->sample_fmt,
+                                        codecContext->sample_rate,
+                                        0,
+                                        NULL);
+    swr_init(au_convert_ctx);
+}
 #pragma mark - Public
 - (NSInteger)streamIndex {
     return self->stream->index;
@@ -65,12 +76,26 @@ fail:
 - (AVCodecContext *)codecContext {
     return self->codecContext;
 }
-- (AVFrame *)decodePacket:(AVPacket *)packet {
+- (int)bufferSize {
+    int buffer_size = av_samples_get_buffer_size(NULL, 2, codecContext->frame_size, [self playSampleFormat], 1);
+    return buffer_size;
+}
+- (AVSampleFormat)playSampleFormat {
+    return AV_SAMPLE_FMT_S16;
+}
+- (int)rate {
+    return self->codecContext->sample_rate;
+}
+- (void)decodePacket:(AVPacket *)packet outBuffer:(uint8_t **)buffer {
     int ret = avcodec_send_packet(self->codecContext, packet);
-    if(ret != 0) return NULL;
-    av_frame_unref(frame);
+    if(ret != 0) return;
+    AVFrame *frame = av_frame_alloc();
     avcodec_receive_frame(self->codecContext, frame);
-    if(ret != 0) return NULL;
-    return frame;
+    if(ret != 0) {
+        av_frame_free(&frame);
+        return;
+    }
+    swr_convert(au_convert_ctx, buffer, frame->nb_samples, (const uint8_t **)frame->data, frame->nb_samples);
+    av_frame_free(&frame);
 }
 @end

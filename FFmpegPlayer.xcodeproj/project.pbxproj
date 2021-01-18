@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A020653725B5B51C00CA6C66 /* FFQueueAudioObject.mm in Sources */ = {isa = PBXBuildFile; fileRef = A020653625B5B51C00CA6C66 /* FFQueueAudioObject.mm */; };
 		A0286A6825A830B100ACBD99 /* FFOpenGLRender.mm in Sources */ = {isa = PBXBuildFile; fileRef = A0286A6725A830B100ACBD99 /* FFOpenGLRender.mm */; };
 		A0286A7425A8316200ACBD99 /* yuv_fragment.glsl in Resources */ = {isa = PBXBuildFile; fileRef = A0286A7225A8316100ACBD99 /* yuv_fragment.glsl */; };
 		A0286A7525A8316200ACBD99 /* vertex.glsl in Resources */ = {isa = PBXBuildFile; fileRef = A0286A7325A8316200ACBD99 /* vertex.glsl */; };
@@ -86,6 +87,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		A020653525B5B51C00CA6C66 /* FFQueueAudioObject.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FFQueueAudioObject.h; sourceTree = "<group>"; };
+		A020653625B5B51C00CA6C66 /* FFQueueAudioObject.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FFQueueAudioObject.mm; sourceTree = "<group>"; };
 		A0286A6625A830B100ACBD99 /* FFOpenGLRender.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FFOpenGLRender.h; sourceTree = "<group>"; };
 		A0286A6725A830B100ACBD99 /* FFOpenGLRender.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = FFOpenGLRender.mm; sourceTree = "<group>"; };
 		A0286A7225A8316100ACBD99 /* yuv_fragment.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = yuv_fragment.glsl; sourceTree = "<group>"; };
@@ -752,6 +755,8 @@
 			children = (
 				A0CCD32C25B305850054C379 /* FFQueue.h */,
 				A0CCD32D25B305850054C379 /* FFQueue.m */,
+				A020653525B5B51C00CA6C66 /* FFQueueAudioObject.h */,
+				A020653625B5B51C00CA6C66 /* FFQueueAudioObject.mm */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -872,6 +877,7 @@
 				A09F447C25A4660B001E4BCA /* FFFilter.mm in Sources */,
 				A09F438425A30B70001E4BCA /* FFMediaVideoContext.mm in Sources */,
 				A09F447225A464D8001E4BCA /* FFRGBRender.mm in Sources */,
+				A020653725B5B51C00CA6C66 /* FFQueueAudioObject.mm in Sources */,
 				A09F424225A2B877001E4BCA /* AppDelegate.m in Sources */,
 				A0CCD32E25B305850054C379 /* FFQueue.m in Sources */,
 				A05BAA2925B06B7400AEC9A4 /* FFMetalRender.mm in Sources */,
