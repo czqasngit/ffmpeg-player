@@ -92,13 +92,15 @@ fail:
     int ret = avcodec_send_packet(self->codecContext, packet);
     if(ret != 0) return NO;
     AVFrame *frame = av_frame_alloc();
-    avcodec_receive_frame(self->codecContext, frame);
-    if(ret != 0) {
+    ret = avcodec_receive_frame(self->codecContext, frame);
+    BOOL is_valid = frame->nb_samples == frame->linesize[0] / self.audioInformation.bytesPerSample;
+    if(ret != 0 || !is_valid) {
+#error 验证有问题
         av_frame_unref(frame);
         av_frame_free(&frame);
         return NO;
     }
-    swr_convert(au_convert_ctx, buffer, frame->nb_samples, (const uint8_t **)frame->data, frame->nb_samples);
+    ret = swr_convert(au_convert_ctx, buffer, frame->nb_samples, (const uint8_t **)frame->data, frame->nb_samples);
     av_frame_unref(frame);
     av_frame_free(&frame);
     return YES;

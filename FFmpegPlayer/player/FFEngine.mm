@@ -14,7 +14,7 @@
 #import "FFQueueAudioObject.h"
 #import "FFQueueVideoObject.h"
 
-#error 这里应该设计成等待的秒
+
 #define MAX_AUDIO_FRAME_COUNT   20
 #define MIN_AUDIO_FRAME_COUNT   10
 
@@ -194,6 +194,7 @@ fail:
     dispatch_async(video_render_dispatch_queue, ^{
         if(self.videoFrameCacheQueue.count < MIN_VIDEO_FRAME_COUNT && !self.isDecodeComplete) {
             NSLog(@"Video is not enough, wait...");
+            [self.decodeCondition signal];
             [self.videoRenderCondition wait];
         }
         FFQueueVideoObject *obj = [self.videoFrameCacheQueue dequeue];
@@ -230,6 +231,7 @@ fail:
     dispatch_async(audio_play_dispatch_queue, ^{
         if(self.audioFrameCacheQueue.count < MIN_AUDIO_FRAME_COUNT && !self.isDecodeComplete) {
             NSLog(@"Audio is not enough, wait…");
+            [self.decodeCondition signal];
             [self.audioPlayCondition wait];
         }
         FFQueueAudioObject *obj = [self.audioFrameCacheQueue dequeue];
