@@ -15,7 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol FFVideoRender <NSObject>
 /// display uncompress video data from ffmpeg
-- (void)displayWithAVFrame:(AVFrame *)frame;
+- (void)displayWithFrame:(AVFrame *)frame;
 - (AVPixelFormat)piexlFormat;
 @end
 

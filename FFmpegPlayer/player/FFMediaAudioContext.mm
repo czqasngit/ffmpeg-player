@@ -8,6 +8,9 @@
 #import "FFMediaAudioContext.h"
 
 @interface FFMediaAudioContext()
+@property (nonatomic, assign)FFAudioInformation audioInformation;
+@property(nonatomic, assign)int64_t lastFramePts;
+
 @end
 @implementation FFMediaAudioContext {
     AVFormatContext *formatContext;
@@ -26,15 +29,17 @@
     if(self) {
         self->stream = stream;
         self->formatContext = formatContext;
-        if(![self _setup]) {
+        if(![self setup]) {
             return NULL;
         }
+        [self setupLastPacketPts];
         [self initializeSwr];
+        
     }
     return self;
 }
 #pragma mark -
-- (BOOL)_setup {
+- (BOOL)setup {
     int ret = 0;
     AVCodecParameters *codecParameters = stream->codecpar;
     self->codec = avcodec_find_decoder(codecParameters->codec_id);
@@ -56,12 +61,18 @@
 fail:
     return NO;
 }
-- (void) initializeSwr {
+- (void)setupLastPacketPts {
+    int64_t duration = stream->duration;
+    _lastFramePts = duration - stream->nb_frames;
+}
+- (void)initializeSwr {
+    FFAudioInformation audioInformation = [self audioInformation];
+    int64_t channel_layout = audioInformation.channels == 1 ? AV_CH_LAYOUT_MONO : AV_CH_LAYOUT_STEREO;
     /// 重采样成双通道,AV_SAMPLE_FMT_S16数据格式
     au_convert_ctx = swr_alloc_set_opts(NULL,
-                                        AV_CH_LAYOUT_STEREO,
-                                        AV_SAMPLE_FMT_S16,
-                                        codecContext->sample_rate,
+                                        channel_layout,
+                                        audioInformation.format,
+                                        audioInformation.rate,
                                         codecContext->channel_layout,
                                         codecContext->sample_fmt,
                                         codecContext->sample_rate,
@@ -76,26 +87,34 @@ fail:
 - (AVCodecContext *)codecContext {
     return self->codecContext;
 }
-- (int)bufferSize {
-    int buffer_size = av_samples_get_buffer_size(NULL, 2, codecContext->frame_size, [self playSampleFormat], 1);
-    return buffer_size;
-}
-- (AVSampleFormat)playSampleFormat {
-    return AV_SAMPLE_FMT_S16;
-}
-- (int)rate {
-    return self->codecContext->sample_rate;
-}
-- (void)decodePacket:(AVPacket *)packet outBuffer:(uint8_t **)buffer {
+
+- (BOOL)decodePacket:(AVPacket *)packet outBuffer:(uint8_t **)buffer {
     int ret = avcodec_send_packet(self->codecContext, packet);
-    if(ret != 0) return;
+    if(ret != 0) return NO;
     AVFrame *frame = av_frame_alloc();
     avcodec_receive_frame(self->codecContext, frame);
     if(ret != 0) {
+        av_frame_unref(frame);
         av_frame_free(&frame);
-        return;
+        return NO;
     }
     swr_convert(au_convert_ctx, buffer, frame->nb_samples, (const uint8_t **)frame->data, frame->nb_samples);
+    av_frame_unref(frame);
     av_frame_free(&frame);
+    return YES;
+}
+- (FFAudioInformation)audioInformation {
+    if(_audioInformation.rate == 0) {
+        _audioInformation.format = AV_SAMPLE_FMT_S16;
+        _audioInformation.channels = 2;
+        _audioInformation.buffer_size = av_samples_get_buffer_size(NULL,
+                                                                   _audioInformation.channels,
+                                                                   codecContext->frame_size,
+                                                                   _audioInformation.format, 1);
+        _audioInformation.rate = self->codecContext->sample_rate;
+        _audioInformation.bytesPerSample = _audioInformation.channels * av_get_bytes_per_sample(_audioInformation.format);
+        _audioInformation.bitsPerChannel = 8 * av_get_bytes_per_sample(_audioInformation.format);
+    }
+    return _audioInformation;
 }
 @end

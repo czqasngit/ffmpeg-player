@@ -11,6 +11,7 @@
 
 @interface FFMediaVideoContext()
 @property (nonatomic, strong)FFFilter *filter;
+@property(nonatomic, assign)int64_t lastFramePts;
 @end
 @implementation FFMediaVideoContext {
     AVFormatContext *formatContext;
@@ -21,7 +22,6 @@
     AVPixelFormat fmt;
     AVFrame *hwFrame;
     AVFrame *frame;
-    AVFrame *outputFrame;
     AVBufferRef *hwDeviceContext;
     BOOL enableHWDecode;
     BOOL supportAudioToolBox;
@@ -38,10 +38,6 @@
     if(frame) {
         av_frame_unref(frame);
         av_frame_free(&frame);
-    }
-    if(outputFrame) {
-        av_frame_unref(outputFrame);
-        av_frame_free(&outputFrame);
     }
     if(hwDeviceContext) {
         av_buffer_unref(&hwDeviceContext);
@@ -66,14 +62,14 @@
         if(!self.filter) {
             return NULL;
         }
+        [self setupLastPacketPts];
         self->frame = av_frame_alloc();
-        self->outputFrame = av_frame_alloc();
     }
     return self;
 }
 #pragma mark -
 - (BOOL)_setupWithEnableHWDecode:(BOOL)enableHWDecode {
-    self.enableHWDecode = enableHWDecode;
+    _enableHWDecode = enableHWDecode;
     int ret = 0;
     AVCodecParameters *codecParameters = stream->codecpar;
     self->codec = avcodec_find_decoder(codecParameters->codec_id);
@@ -125,7 +121,12 @@
 fail:
     return NO;
 }
-
+- (void)setupLastPacketPts {
+    int64_t duration = stream->duration;
+    AVRational time_base = stream->time_base;
+    AVRational fps = stream->avg_frame_rate;
+    _lastFramePts = duration - time_base.den / fps.num;
+}
 
 #pragma mark - Public
 - (NSInteger)streamIndex {
@@ -137,28 +138,27 @@ fail:
 - (int)fps {
     return av_q2d(stream->avg_frame_rate);
 }
-- (AVFrame *)decodePacket:(AVPacket *)packet {
-    CFTimeInterval start = CFAbsoluteTimeGetCurrent();
+- (BOOL)decodePacket:(AVPacket *)packet frame:(AVFrame **)frame {
     int ret = avcodec_send_packet(self.codecContext, packet);
+    if(ret != 0) return NO;
+    AVFrame *outputFrame = *frame;
     av_frame_unref(self->hwFrame);
-    if(ret != 0) return NULL;
     if(self.enableHWDecode && supportAudioToolBox) {
         ret = avcodec_receive_frame(self.codecContext, self->hwFrame);
-        if(ret != 0) return NULL;
+        if(ret != 0) return NO;
         av_frame_unref(self->frame);
         ret = av_hwframe_transfer_data(self->frame, self->hwFrame, 0);
     } else {
         ret = avcodec_receive_frame(self.codecContext, self->frame);
-        if(ret != 0) return NULL;
+        if(ret != 0) return NO;
     }
-    CFTimeInterval end = CFAbsoluteTimeGetCurrent();
-//    NSLog(@"解码时间: %f", end - start);
-    if(ret != 0) return NULL;
+    if(ret != 0) return NO;
+    if(self->frame->pts == AV_NOPTS_VALUE) {
+        self->frame->pts = self->hwFrame->pts;
+    }
     av_frame_unref(outputFrame);
-    self->frame->pts = packet->pts;
     [self.filter getTargetFormatFrameWithInputFrame:self->frame
                                 outputFrame:&outputFrame];
-//    NSLog(@"读取到视频帧:%lld", self->outputFrame->pts);
-    return self->outputFrame;
+    return YES;
 }
 @end

@@ -39,7 +39,7 @@
     }
 }
 #pragma mark - Public
-- (void)displayWithAVFrame:(AVFrame *)rgbFrame {
+- (void)displayWithFrame:(AVFrame *)rgbFrame {
     int linesize = rgbFrame->linesize[0];
     int videoHeight = rgbFrame->height;
     int videoWidth = rgbFrame->width;

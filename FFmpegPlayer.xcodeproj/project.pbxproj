@@ -14,6 +14,11 @@
 		A0286A7825A831E900ACBD99 /* yuv_fragment.glsl in Resources */ = {isa = PBXBuildFile; fileRef = A0286A7225A8316100ACBD99 /* yuv_fragment.glsl */; };
 		A0286A7925A831E900ACBD99 /* vertex.glsl in Resources */ = {isa = PBXBuildFile; fileRef = A0286A7325A8316200ACBD99 /* vertex.glsl */; };
 		A0286A7D25A831FF00ACBD99 /* FFOpenGLRender.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0286A7C25A831FF00ACBD99 /* FFOpenGLRender.swift */; };
+		A02A93C225B6802F00CAD2BA /* FFQueueVideoObject.mm in Sources */ = {isa = PBXBuildFile; fileRef = A02A93C125B6802F00CAD2BA /* FFQueueVideoObject.mm */; };
+		A02A93C625B6B6C300CAD2BA /* flutter.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = A02A93C525B6B6C300CAD2BA /* flutter.mp4 */; };
+		A02A93C725B6B6C300CAD2BA /* flutter.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = A02A93C525B6B6C300CAD2BA /* flutter.mp4 */; };
+		A02A93CD25B6B78800CAD2BA /* short.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = A02A93CC25B6B78800CAD2BA /* short.mp4 */; };
+		A02A93CE25B6B78800CAD2BA /* short.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = A02A93CC25B6B78800CAD2BA /* short.mp4 */; };
 		A05BAA2925B06B7400AEC9A4 /* FFMetalRender.mm in Sources */ = {isa = PBXBuildFile; fileRef = A05BAA2725B06B7400AEC9A4 /* FFMetalRender.mm */; };
 		A05BAA2F25B06BFD00AEC9A4 /* MetalKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A05BAA2E25B06BFD00AEC9A4 /* MetalKit.framework */; };
 		A05BAA3325B06C0400AEC9A4 /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A05BAA3225B06C0400AEC9A4 /* Metal.framework */; };
@@ -94,6 +99,11 @@
 		A0286A7225A8316100ACBD99 /* yuv_fragment.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = yuv_fragment.glsl; sourceTree = "<group>"; };
 		A0286A7325A8316200ACBD99 /* vertex.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = vertex.glsl; sourceTree = "<group>"; };
 		A0286A7C25A831FF00ACBD99 /* FFOpenGLRender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FFOpenGLRender.swift; sourceTree = "<group>"; };
+		A02A93BB25B66C4700CAD2BA /* FFAudioInformation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FFAudioInformation.h; sourceTree = "<group>"; };
+		A02A93C025B6802F00CAD2BA /* FFQueueVideoObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FFQueueVideoObject.h; sourceTree = "<group>"; };
+		A02A93C125B6802F00CAD2BA /* FFQueueVideoObject.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = FFQueueVideoObject.mm; sourceTree = "<group>"; };
+		A02A93C525B6B6C300CAD2BA /* flutter.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = flutter.mp4; sourceTree = "<group>"; };
+		A02A93CC25B6B78800CAD2BA /* short.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = short.mp4; sourceTree = "<group>"; };
 		A05BAA2725B06B7400AEC9A4 /* FFMetalRender.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = FFMetalRender.mm; sourceTree = "<group>"; };
 		A05BAA2825B06B7400AEC9A4 /* FFMetalRender.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FFMetalRender.h; sourceTree = "<group>"; };
 		A05BAA2E25B06BFD00AEC9A4 /* MetalKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MetalKit.framework; path = System/Library/Frameworks/MetalKit.framework; sourceTree = SDKROOT; };
@@ -660,6 +670,7 @@
 				A09F438325A30B70001E4BCA /* FFMediaVideoContext.mm */,
 				A09F438725A30B7C001E4BCA /* FFMediaAudioContext.h */,
 				A09F438825A30B7C001E4BCA /* FFMediaAudioContext.mm */,
+				A02A93BB25B66C4700CAD2BA /* FFAudioInformation.h */,
 				A09F447A25A4660B001E4BCA /* FFFilter.h */,
 				A09F447B25A4660B001E4BCA /* FFFilter.mm */,
 			);
@@ -704,6 +715,8 @@
 				A0286A7125A8315A00ACBD99 /* glsl */,
 				A09F437925A30758001E4BCA /* audio.mp3 */,
 				A09F437425A3074D001E4BCA /* 1280x720.mp4 */,
+				A02A93C525B6B6C300CAD2BA /* flutter.mp4 */,
+				A02A93CC25B6B78800CAD2BA /* short.mp4 */,
 			);
 			path = resources;
 			sourceTree = "<group>";
@@ -757,6 +770,8 @@
 				A0CCD32D25B305850054C379 /* FFQueue.m */,
 				A020653525B5B51C00CA6C66 /* FFQueueAudioObject.h */,
 				A020653625B5B51C00CA6C66 /* FFQueueAudioObject.mm */,
+				A02A93C025B6802F00CAD2BA /* FFQueueVideoObject.h */,
+				A02A93C125B6802F00CAD2BA /* FFQueueVideoObject.mm */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -840,8 +855,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A02A93CD25B6B78800CAD2BA /* short.mp4 in Resources */,
 				A0286A7425A8316200ACBD99 /* yuv_fragment.glsl in Resources */,
 				A09F437525A3074D001E4BCA /* 1280x720.mp4 in Resources */,
+				A02A93C625B6B6C300CAD2BA /* flutter.mp4 in Resources */,
 				A09F424725A2B878001E4BCA /* Assets.xcassets in Resources */,
 				A0286A7525A8316200ACBD99 /* vertex.glsl in Resources */,
 				A09F424A25A2B879001E4BCA /* Main.storyboard in Resources */,
@@ -853,8 +870,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A02A93CE25B6B78800CAD2BA /* short.mp4 in Resources */,
 				A0286A7825A831E900ACBD99 /* yuv_fragment.glsl in Resources */,
 				A09F437625A3074D001E4BCA /* 1280x720.mp4 in Resources */,
+				A02A93C725B6B6C300CAD2BA /* flutter.mp4 in Resources */,
 				A09F426025A2B8A6001E4BCA /* Assets.xcassets in Resources */,
 				A0286A7925A831E900ACBD99 /* vertex.glsl in Resources */,
 				A09F426325A2B8A6001E4BCA /* Main.storyboard in Resources */,
@@ -881,6 +900,7 @@
 				A09F424225A2B877001E4BCA /* AppDelegate.m in Sources */,
 				A0CCD32E25B305850054C379 /* FFQueue.m in Sources */,
 				A05BAA2925B06B7400AEC9A4 /* FFMetalRender.mm in Sources */,
+				A02A93C225B6802F00CAD2BA /* FFQueueVideoObject.mm in Sources */,
 				A0CCD32625B29C2B0054C379 /* FFAudioQueuePlayer.mm in Sources */,
 				A09F438925A30B7C001E4BCA /* FFMediaAudioContext.mm in Sources */,
 				A0286A6825A830B100ACBD99 /* FFOpenGLRender.mm in Sources */,

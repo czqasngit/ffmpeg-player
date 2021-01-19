@@ -163,7 +163,7 @@
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 #pragma mark - Override
-- (void)displayWithAVFrame:(AVFrame *)yuvFrame {
+- (void)displayWithFrame:(AVFrame *)yuvFrame {
     int videoWidth = yuvFrame->width;
     int videoHeight = yuvFrame->height;
     CGLLockContext([self.openGLContext CGLContextObj]);

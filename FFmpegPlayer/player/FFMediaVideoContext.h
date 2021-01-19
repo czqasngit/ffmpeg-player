@@ -15,8 +15,10 @@ extern "C" {
 NS_ASSUME_NONNULL_BEGIN
 
 @interface FFMediaVideoContext : NSObject
-@property (nonatomic, assign)BOOL enableHWDecode;
+@property(nonatomic, assign, readonly)BOOL enableHWDecode;
 @property(nonatomic, assign, readonly)NSInteger streamIndex;
+/// 最后一帧的pts
+@property(nonatomic, assign, readonly)int64_t lastFramePts;
 
 /// 初始化VideoContext
 /// @param stream 视频流AVStream
@@ -28,7 +30,7 @@ NS_ASSUME_NONNULL_BEGIN
                   enableHWDecode:(BOOL)enableHWDecode;
 - (AVCodecContext *)codecContext;
 - (int)fps;
-- (AVFrame *)decodePacket:(AVPacket *)packet;
+- (BOOL)decodePacket:(AVPacket *)packet frame:(AVFrame *_Nonnull*_Nonnull)frame;
 @end
 
 NS_ASSUME_NONNULL_END

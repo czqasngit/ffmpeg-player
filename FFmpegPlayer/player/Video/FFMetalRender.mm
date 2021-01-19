@@ -104,7 +104,7 @@
 }
 
 #pragma mark - Override
-- (void)displayWithAVFrame:(AVFrame *)frame {
+- (void)displayWithFrame:(AVFrame *)frame {
     CVPixelBufferRef pixelBuffer = [self createCVPixelBufferFromAVFrame:frame];
     if(!pixelBuffer) return;
     dispatch_async(display_metal_queue, ^{
