@@ -12,13 +12,29 @@ extern "C" {
 #include <libavfilter/avfilter.h>
 }
 #import "FFVideoRender.h"
+#import "FFAudioQueuePlayer.h"
+#import "FFVideoPlayer.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface FFEngine : NSObject
 - (instancetype)initWithVideoRender:(id<FFVideoRender>)videoRender;
 - (BOOL)setup:(const char *)url enableHWDecode:(BOOL)enableHWDecode;
+@end
 
+@interface FFEngine (Control)
+- (void)startVideoPlay;
+- (void)stopVideoPlay;
+- (void)startAudioPlay;
+- (void)stopAudioPlay;
+@end
+@interface FFEngine (Decode)
+- (void)decode;
+@end
+@interface FFEngine (Video)<FFVideoPlayerDelegate>
+@end
+
+@interface FFEngine (Audio)<FFAudioQueuePlayerDelegate>
 @end
 
 NS_ASSUME_NONNULL_END

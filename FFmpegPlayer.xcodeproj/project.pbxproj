@@ -87,7 +87,8 @@
 		A09F449725A560EB001E4BCA /* FFVideoRender.swift in Sources */ = {isa = PBXBuildFile; fileRef = A09F449625A560EB001E4BCA /* FFVideoRender.swift */; };
 		A09F449B25A5615B001E4BCA /* FFRGBRender.swift in Sources */ = {isa = PBXBuildFile; fileRef = A09F449A25A5615B001E4BCA /* FFRGBRender.swift */; };
 		A0CCD32625B29C2B0054C379 /* FFAudioQueuePlayer.mm in Sources */ = {isa = PBXBuildFile; fileRef = A0CCD32525B29C2B0054C379 /* FFAudioQueuePlayer.mm */; };
-		A0CCD32E25B305850054C379 /* FFQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = A0CCD32D25B305850054C379 /* FFQueue.m */; };
+		A0CCD32E25B305850054C379 /* FFObjectQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = A0CCD32D25B305850054C379 /* FFObjectQueue.m */; };
+		A0E4858A25B7D6EC00E73DF0 /* FFVideoPlayer.mm in Sources */ = {isa = PBXBuildFile; fileRef = A0E4858925B7D6EC00E73DF0 /* FFVideoPlayer.mm */; };
 		BEEF9411522BC4C1B4892145 /* FFMetalRender.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEEF90A8E689CA0F78500E71 /* FFMetalRender.swift */; };
 /* End PBXBuildFile section */
 
@@ -295,8 +296,10 @@
 		A09F449A25A5615B001E4BCA /* FFRGBRender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FFRGBRender.swift; sourceTree = "<group>"; };
 		A0CCD32425B29C2B0054C379 /* FFAudioQueuePlayer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FFAudioQueuePlayer.h; sourceTree = "<group>"; };
 		A0CCD32525B29C2B0054C379 /* FFAudioQueuePlayer.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FFAudioQueuePlayer.mm; sourceTree = "<group>"; };
-		A0CCD32C25B305850054C379 /* FFQueue.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FFQueue.h; sourceTree = "<group>"; };
-		A0CCD32D25B305850054C379 /* FFQueue.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FFQueue.m; sourceTree = "<group>"; };
+		A0CCD32C25B305850054C379 /* FFObjectQueue.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FFObjectQueue.h; sourceTree = "<group>"; };
+		A0CCD32D25B305850054C379 /* FFObjectQueue.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FFObjectQueue.m; sourceTree = "<group>"; };
+		A0E4858825B7D6EC00E73DF0 /* FFVideoPlayer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FFVideoPlayer.h; sourceTree = "<group>"; };
+		A0E4858925B7D6EC00E73DF0 /* FFVideoPlayer.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FFVideoPlayer.mm; sourceTree = "<group>"; };
 		BEEF90A8E689CA0F78500E71 /* FFMetalRender.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FFMetalRender.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -739,6 +742,8 @@
 				A09F447025A464D8001E4BCA /* FFRGBRender.h */,
 				A09F447125A464D8001E4BCA /* FFRGBRender.mm */,
 				A09F447525A4651D001E4BCA /* FFVideoRender.h */,
+				A0E4858825B7D6EC00E73DF0 /* FFVideoPlayer.h */,
+				A0E4858925B7D6EC00E73DF0 /* FFVideoPlayer.mm */,
 			);
 			path = Video;
 			sourceTree = "<group>";
@@ -766,8 +771,8 @@
 		A0CCD32B25B3055D0054C379 /* Utils */ = {
 			isa = PBXGroup;
 			children = (
-				A0CCD32C25B305850054C379 /* FFQueue.h */,
-				A0CCD32D25B305850054C379 /* FFQueue.m */,
+				A0CCD32C25B305850054C379 /* FFObjectQueue.h */,
+				A0CCD32D25B305850054C379 /* FFObjectQueue.m */,
 				A020653525B5B51C00CA6C66 /* FFQueueAudioObject.h */,
 				A020653625B5B51C00CA6C66 /* FFQueueAudioObject.mm */,
 				A02A93C025B6802F00CAD2BA /* FFQueueVideoObject.h */,
@@ -889,6 +894,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A05BAA3D25B06D9700AEC9A4 /* Shaders.metal in Sources */,
+				A0E4858A25B7D6EC00E73DF0 /* FFVideoPlayer.mm in Sources */,
 				A09F424525A2B877001E4BCA /* ViewController.m in Sources */,
 				A09F436E25A3045A001E4BCA /* FFEngine.mm in Sources */,
 				A09F424D25A2B879001E4BCA /* main.m in Sources */,
@@ -898,7 +904,7 @@
 				A09F447225A464D8001E4BCA /* FFRGBRender.mm in Sources */,
 				A020653725B5B51C00CA6C66 /* FFQueueAudioObject.mm in Sources */,
 				A09F424225A2B877001E4BCA /* AppDelegate.m in Sources */,
-				A0CCD32E25B305850054C379 /* FFQueue.m in Sources */,
+				A0CCD32E25B305850054C379 /* FFObjectQueue.m in Sources */,
 				A05BAA2925B06B7400AEC9A4 /* FFMetalRender.mm in Sources */,
 				A02A93C225B6802F00CAD2BA /* FFQueueVideoObject.mm in Sources */,
 				A0CCD32625B29C2B0054C379 /* FFAudioQueuePlayer.mm in Sources */,

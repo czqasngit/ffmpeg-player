@@ -5,13 +5,13 @@
 //  Created by Mark on 2021/1/16.
 //
 
-#import "FFQueue.h"
+#import "FFObjectQueue.h"
 #import <pthread.h>
 
-@interface FFQueue()
+@interface FFObjectQueue()
 @property(nonatomic, strong)NSMutableArray *storage;
 @end
-@implementation FFQueue {
+@implementation FFObjectQueue {
     pthread_mutex_t locker;
 }
 
@@ -28,7 +28,10 @@
 - (id _Nullable)dequeue {
     id obj = NULL;
     pthread_mutex_lock(&locker);
-    if(_storage.count == 0) return NULL;
+    if(_storage.count == 0) {
+        pthread_mutex_unlock(&locker);
+        return NULL;
+    }
     obj = _storage.lastObject;
     [_storage removeLastObject];
     pthread_mutex_unlock(&locker);

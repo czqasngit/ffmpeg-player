@@ -9,7 +9,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface FFQueue : NSObject
+@interface FFObjectQueue : NSObject
 - (id _Nullable)dequeue;
 - (void)enqueue:(id)object;
 - (NSInteger)count;

@@ -9,7 +9,7 @@
 
 @implementation FFQueueAudioObject {
     uint8_t *data;
-    int length;
+    int64_t length;
 }
 - (void)dealloc {
     free(self->data);
@@ -27,6 +27,9 @@
 }
 - (int)length {
     return self->length;
+}
+- (void)updateLength:(int64_t)length {
+    self->length = length;
 }
 
 @end

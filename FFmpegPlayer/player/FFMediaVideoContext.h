@@ -31,6 +31,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (AVCodecContext *)codecContext;
 - (int)fps;
 - (BOOL)decodePacket:(AVPacket *)packet frame:(AVFrame *_Nonnull*_Nonnull)frame;
+- (float)oneFrameDuration;
 @end
 
 NS_ASSUME_NONNULL_END

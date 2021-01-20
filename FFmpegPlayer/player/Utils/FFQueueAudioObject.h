@@ -11,7 +11,8 @@ NS_ASSUME_NONNULL_BEGIN
 @interface FFQueueAudioObject : NSObject
 - (instancetype)initWithLength:(int)length;
 - (uint8_t *)data;
-- (int)length;
+- (int64_t)length;
+- (void)updateLength:(int64_t)length;
 @end
 
 NS_ASSUME_NONNULL_END

@@ -91,9 +91,9 @@ static void _AudioQueueOutputCallback(void *inUserData, AudioQueueRef inAQ, Audi
 }
 
 #pragma mark - Public
-- (void)receiveData:(uint8_t *)data length:(int)length aqBuffer:(AudioQueueBufferRef)aqBuffer {
+- (void)receiveData:(uint8_t *)data length:(int64_t)length aqBuffer:(AudioQueueBufferRef)aqBuffer {
     if(!data || !aqBuffer) return;
-    aqBuffer->mAudioDataByteSize = length;
+    aqBuffer->mAudioDataByteSize = (int)length;
     memcpy(aqBuffer->mAudioData, data, length);
     AudioQueueEnqueueBuffer(self->audioQueue, aqBuffer, 0, NULL);
 }

@@ -175,7 +175,7 @@
         });
     });
 }
-- (AVPixelFormat)piexlFormat {
+- (AVPixelFormat)pixelFormat {
     return AV_PIX_FMT_NV12;
 }
 

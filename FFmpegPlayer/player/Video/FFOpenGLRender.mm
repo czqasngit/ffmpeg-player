@@ -195,7 +195,7 @@
     CGLUnlockContext([self.openGLContext CGLContextObj]);
     
 }
-- (AVPixelFormat)piexlFormat {
+- (AVPixelFormat)pixelFormat {
     return AV_PIX_FMT_YUV420P;
 }
 

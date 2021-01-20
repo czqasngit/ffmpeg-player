@@ -161,4 +161,8 @@ fail:
                                 outputFrame:&outputFrame];
     return YES;
 }
+- (float)oneFrameDuration {
+    float d = 1.0f / av_q2d(stream->avg_frame_rate);
+    return d;
+}
 @end
