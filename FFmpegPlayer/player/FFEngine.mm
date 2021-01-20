@@ -154,7 +154,9 @@ fail:
                         /// 通知视频渲染队列可以继续渲染了
                         /// 如果视频渲染队列未暂停则无作用
                         if(videoCacheDuration >= MIN_VIDEO_FRAME_DURATION) {
-                            [self.videoRenderCondition signal];
+                            dispatch_async(dispatch_get_main_queue(), ^{
+                                [self.videoRenderCondition signal];
+                            });
                         }
                     }
                 } else if(self.mediaAudioContext && self->packet->stream_index == self.mediaAudioContext.streamIndex) {
@@ -172,7 +174,9 @@ fail:
                         /// 通知音频渲染队列可以继续渲染了
                         /// 如果音频渲染队列未暂停则无作用
                         if(audioCacheDuration >= MIN_AUDIO_FRAME_DURATION) {
-                            [self.audioPlayCondition signal];
+                            dispatch_async(dispatch_get_main_queue(), ^{
+                                [self.audioPlayCondition signal];
+                            });
                         }
                     }
                 }
@@ -257,12 +261,16 @@ fail:
         pthread_mutex_unlock(&(self->mutex));
         if(audioCacheDuration < MIN_AUDIO_FRAME_DURATION && !isDecodeComplete) {
             NSLog(@"Audio is not enough, wait…");
-            [self.decodeCondition signal];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self.decodeCondition signal];
+            });
             [self.audioPlayCondition wait];
         }
         FFQueueAudioObject *obj = [self.audioFrameCacheQueue dequeue];
         if(audioCacheDuration < MAX_AUDIO_FRAME_DURATION) {
-            [self.decodeCondition signal];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self.decodeCondition signal];
+            });
         }
         if(obj) {
             [self.audioPlayer receiveData:obj.data length:obj.length aqBuffer:aqBuffer];
