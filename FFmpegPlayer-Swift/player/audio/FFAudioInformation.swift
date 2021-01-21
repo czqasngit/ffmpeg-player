@@ -10,13 +10,13 @@ import Foundation
 /// 播放器参数
 struct FFAudioInformation {
     /// 解码后一个完整的数据包字节数
-    var buffer_size: Int
+    var bufferSize: Int
     /// 采样数据格式
-    var format: AVSampleFormat = AV_SAMPLE_FMT_S16
+    var format: AVSampleFormat
     /// 采样率
     var rate: Int
     /// 通道
-    var channels: Int = 2
+    var channels: Int
     /// 一个采样每个通道占的位宽
     var bitsPerChannel: Int
     /// 一个采样的字节数

@@ -47,6 +47,21 @@ class FFMediaAudioContext {
         print("Decodec: \(String.init(cString: codec.pointee.long_name))");
         print("=========================================================");
         
+        let fmt = AV_SAMPLE_FMT_S16
+        let channels = 2
+        let buffer_size = Int(av_samples_get_buffer_size(nil,
+                                                         Int32(channels),
+                                                         codecContext.pointee.frame_size,
+                                                         fmt,
+                                                         1))
+        let bitsPerChannel = Int(av_get_bytes_per_sample(fmt)) * 8
+        let bytesPerSample = Int(av_get_bytes_per_sample(fmt)) * channels
+        self.audioInformation = .init(bufferSize: buffer_size,
+                                      format: fmt,
+                                      rate: Int(codecContext.pointee.sample_rate),
+                                      channels: channels,
+                                      bitsPerChannel: bitsPerChannel,
+                                      bytesPerSample: bytesPerSample)
         return true
     }
 }

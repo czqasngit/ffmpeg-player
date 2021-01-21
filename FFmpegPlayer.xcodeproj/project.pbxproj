@@ -30,6 +30,7 @@
 		A09CF27C25B953BF00732211 /* FFVideoCacheObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = A09CF27B25B953BF00732211 /* FFVideoCacheObject.swift */; };
 		A09CF28025B9560400732211 /* FFVideoPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A09CF27F25B9560400732211 /* FFVideoPlayer.swift */; };
 		A09CF28825B96A9400732211 /* FFAudioInformation.swift in Sources */ = {isa = PBXBuildFile; fileRef = A09CF28725B96A9400732211 /* FFAudioInformation.swift */; };
+		A09CF32425B9858600732211 /* FFAudioPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A09CF32325B9858600732211 /* FFAudioPlayer.swift */; };
 		A09F424225A2B877001E4BCA /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = A09F424125A2B877001E4BCA /* AppDelegate.m */; };
 		A09F424525A2B877001E4BCA /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A09F424425A2B877001E4BCA /* ViewController.m */; };
 		A09F424725A2B878001E4BCA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A09F424625A2B878001E4BCA /* Assets.xcassets */; };
@@ -120,6 +121,7 @@
 		A09CF27B25B953BF00732211 /* FFVideoCacheObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FFVideoCacheObject.swift; sourceTree = "<group>"; };
 		A09CF27F25B9560400732211 /* FFVideoPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FFVideoPlayer.swift; sourceTree = "<group>"; };
 		A09CF28725B96A9400732211 /* FFAudioInformation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FFAudioInformation.swift; sourceTree = "<group>"; };
+		A09CF32325B9858600732211 /* FFAudioPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FFAudioPlayer.swift; sourceTree = "<group>"; };
 		A09F423D25A2B877001E4BCA /* FFmpegPlayer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FFmpegPlayer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A09F424025A2B877001E4BCA /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		A09F424125A2B877001E4BCA /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -400,6 +402,7 @@
 			isa = PBXGroup;
 			children = (
 				A09CF28725B96A9400732211 /* FFAudioInformation.swift */,
+				A09CF32325B9858600732211 /* FFAudioPlayer.swift */,
 			);
 			path = audio;
 			sourceTree = "<group>";
@@ -953,6 +956,7 @@
 				A09F449725A560EB001E4BCA /* FFVideoRender.swift in Sources */,
 				A09CF27825B953B600732211 /* FFAudioCacheObject.swift in Sources */,
 				A09F436725A30181001E4BCA /* FFPlayer.swift in Sources */,
+				A09CF32425B9858600732211 /* FFAudioPlayer.swift in Sources */,
 				A09F425C25A2B8A5001E4BCA /* AppDelegate.swift in Sources */,
 				A09F449B25A5615B001E4BCA /* FFRGBRender.swift in Sources */,
 				A09CF27425B9524600732211 /* FFCacheQueue.swift in Sources */,
