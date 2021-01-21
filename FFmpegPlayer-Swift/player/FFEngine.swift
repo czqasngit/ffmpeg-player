@@ -7,14 +7,38 @@
 
 import Foundation
 
+private let MIN_AUDIO_CACHE_DURATION: Double  = 1
+private let MAX_AUDIO_CACHE_DURATION: Double = 2
+private let MIN_VIDEO_CACHE_DURATION: Double  = 1
+private let MAX_VIDEO_CACHE_DURATION: Double  = 2
+
+private func _Wakeup(cond: NSCondition) {
+    DispatchQueue.main.async {
+        cond.signal()
+    }
+}
+private func _Sleep(cond: NSCondition) {
+    cond.wait()
+}
+
 class FFEngine {
     
     private let render: FFVideoRender
+    private var videoPlayer: FFVideoPlayer?
     private var formatContext:UnsafeMutablePointer<AVFormatContext>!
-    private var videoContext: FFMediaVideoContext!
-    private var audioContext: FFMediaAudioContext!
-    private var decodeTimer: Timer?
+    private var videoContext: FFMediaVideoContext?
+    private var audioContext: FFMediaAudioContext?
+    private let videoCacheQueue = FFCacheQueue<FFVideoCacheObject>.init()
+    private let audioCacheQueue = FFCacheQueue<FFAudioCacheObject>.init()
     private let decodeQueue = DispatchQueue.init(label: "decode queue")
+    private let audioPlayQueue = DispatchQueue.init(label: "audio play queue")
+    private let videoRenderQueue = DispatchQueue.init(label: "video render queue")
+    private let decodeCondition = NSCondition.init()
+    private let audioCondition = NSCondition.init()
+    private let videoCondition = NSCondition.init()
+    private var mutex = pthread_mutex_t.init()
+    private var decodeCompleted = false
+    
     private var packet = av_packet_alloc()
     
     deinit {
@@ -39,6 +63,10 @@ class FFEngine {
                     return false
                 }
                 self.videoContext = vc
+                self.videoPlayer = FFVideoPlayer.init(queue: self.videoRenderQueue,
+                                                      render: self.render,
+                                                      fps: vc.fps,
+                                                      delegate: self)
             } else if mediaType == AVMEDIA_TYPE_AUDIO {
                 guard let ac = FFMediaAudioContext.init(stream: stream, formatContext: formatContext) else {
                     avformat_close_input(&formatContext)
@@ -48,17 +76,6 @@ class FFEngine {
             }
         }
         return true
-    }
-    private func startDecodeTimer() {
-        if let timer = self.decodeTimer {
-            timer.invalidate()
-            self.decodeTimer = nil
-        }
-        self.decodeTimer = Timer.scheduledTimer(timeInterval: 1.0 / self.videoContext.fps,
-                                                target: self,
-                                                selector: #selector(displayNext(frame:)),
-                                                userInfo: nil,
-                                                repeats: true)
     }
     // MARK: -
     public func setup(url: String, enableHWDecode: Bool) -> Bool {
@@ -73,25 +90,106 @@ class FFEngine {
         let streamCount = formatContext.pointee.nb_streams
         guard  streamCount > 0 else { return false }
         guard setupMediaContext(enableHWDecode: enableHWDecode) else { return false }
-        self.startDecodeTimer()
+        self.start()
         return true;
     }
 }
-
 extension FFEngine {
-    @objc private func displayNext(frame: UnsafeMutablePointer<AVFrame>) {
+    func start() {
+        self.decode()
+        self.videoPlayer?.startPlay()
+    }
+    func stop() {
+        self.videoPlayer?.stopPlay()
+    }
+}
+extension FFEngine {
+    func hasEnoughAudio() -> Bool {
+        return true
+        guard let audioContext = self.audioContext else { return true }
+        return Double(self.audioCacheQueue.count()) * audioContext.onFrameDuration() >= MAX_AUDIO_CACHE_DURATION
+    }
+    func audioCanKeepMoving() -> Bool {
+        guard let audioContext = self.audioContext else { return false }
+        return Double(self.audioCacheQueue.count()) * audioContext.onFrameDuration() >= MIN_AUDIO_CACHE_DURATION
+    }
+    func audioRequireWait() -> Bool {
+        guard let audioContext = self.audioContext else { return false }
+        return Double(self.audioCacheQueue.count()) * audioContext.onFrameDuration() < MIN_AUDIO_CACHE_DURATION
+    }
+    func hasEnoughVideo() -> Bool {
+        guard let videoContext = self.videoContext else { return true }
+        return Double(self.videoCacheQueue.count()) * videoContext.onFrameDuration() >= MAX_VIDEO_CACHE_DURATION
+    }
+    func videoCanKeepMoving() -> Bool {
+        guard let videoContext = self.videoContext else { return false }
+        return Double(self.videoCacheQueue.count()) * videoContext.onFrameDuration() >= MIN_VIDEO_CACHE_DURATION
+    }
+    func videoRequireWait() -> Bool {
+        guard let videoContext = self.videoContext else { return false }
+        return Double(self.videoCacheQueue.count()) * videoContext.onFrameDuration() < MIN_VIDEO_CACHE_DURATION
+    }
+    
+}
+extension FFEngine {
+    private func decode() {
         decodeQueue.async {
-            /// only display video use this variable
-            var stop = false
-            while(!stop) {
+            while(true) {
+                print("[Cache] audio: \(self.audioCacheQueue.count()), video: \(self.videoCacheQueue.count()), \(self.hasEnoughVideo()), \(self.hasEnoughAudio())")
+                if self.hasEnoughAudio() && self.hasEnoughVideo() {
+                    _Sleep(cond: self.decodeCondition)
+                }
                 av_packet_unref(self.packet)
-                if(av_read_frame(self.formatContext, self.packet) == 0) {
-                    if(self.packet!.pointee.stream_index == self.videoContext.streamIndex) {
-                        if let frame = self.videoContext.decode(packet: self.packet!) {
-                            self.render.display(with: frame)
-                            stop = true
+                let ret = av_read_frame(self.formatContext, self.packet)
+                if ret == 0 {
+                    if let videoContext = self.videoContext,
+                       self.packet!.pointee.stream_index == videoContext.streamIndex {
+                        let obj = FFVideoCacheObject.init()
+                        var frame = obj.getFrame()
+                        if let videoContext = self.videoContext,
+                           videoContext.decode(packet: self.packet!, outputFrame: &frame) {
+                            self.videoCacheQueue.enqueue(obj)
+                            if self.videoCanKeepMoving() {
+                                _Wakeup(cond: self.videoCondition)
+                            }
                         }
+                    } else if let audioContext = self.audioContext,
+                              self.packet!.pointee.stream_index == audioContext.streamIndex {
+                        
                     }
+                } else {
+                    if ret == READ_END_OF_FILE {
+                        pthread_mutex_lock(&(self.mutex))
+                        self.decodeCompleted = true
+                        pthread_mutex_unlock(&(self.mutex))
+                        break
+                    }
+                }
+            }
+            print("Decode complete")
+        }
+    }
+}
+
+extension FFEngine : FFVideoPlayerProtocol {
+    func readNextFrame() {
+        self.videoRenderQueue.async {
+            pthread_mutex_lock(&(self.mutex))
+            let _decodecComplete = self.decodeCompleted
+            pthread_mutex_unlock(&(self.mutex))
+            if self.videoRequireWait() && !_decodecComplete {
+                _Wakeup(cond: self.decodeCondition)
+                _Sleep(cond: self.videoCondition)
+            }
+            if let obj = self.videoCacheQueue.dequeue() {
+                self.videoPlayer?.displayFrame(frame: obj.getFrame())
+                if !self.hasEnoughVideo() {
+                    _Wakeup(cond: self.decodeCondition)
+                }
+            } else {
+                if _decodecComplete {
+                    print("Video frame render completed.")
+                    self.videoPlayer?.stopPlay()
                 }
             }
         }

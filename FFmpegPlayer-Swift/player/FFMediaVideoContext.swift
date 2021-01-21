@@ -14,7 +14,6 @@ class FFMediaVideoContext {
     private let fmt: AVPixelFormat
     private var frame = av_frame_alloc()
     private var hwFrame: UnsafeMutablePointer<AVFrame>!
-    private var outputFrame = av_frame_alloc()
     private var filter: FFFilter!
     
     private var codec: UnsafeMutablePointer<AVCodec>!
@@ -28,8 +27,6 @@ class FFMediaVideoContext {
         }
         av_frame_unref(frame)
         av_frame_free(&frame)
-        av_frame_unref(outputFrame);
-        av_frame_free(&outputFrame)
         if self.hwFrame != nil {
             av_frame_unref(self.hwFrame)
             av_frame_free(&hwFrame)
@@ -98,24 +95,26 @@ class FFMediaVideoContext {
 extension FFMediaVideoContext {
     public var streamIndex: Int { Int(self.stream.pointee.index) }
     public var fps: Double { av_q2d(self.stream.pointee.avg_frame_rate) }
-    public func decode(packet: UnsafeMutablePointer<AVPacket>) -> UnsafeMutablePointer<AVFrame>? {
+    public func onFrameDuration() -> Double { 1.0 / av_q2d(stream.pointee.avg_frame_rate) }
+    public func decode(packet: UnsafeMutablePointer<AVPacket>,
+                       outputFrame: UnsafeMutablePointer<UnsafeMutablePointer<AVFrame>>) -> Bool {
         var ret = avcodec_send_packet(codecContext, packet)
-        guard ret == 0 else { return nil }
+        guard ret == 0 else { return false }
         av_frame_unref(frame)
         if codecContext.pointee.hw_device_ctx != nil {
             av_frame_unref(self.hwFrame)
             ret = avcodec_receive_frame(codecContext, hwFrame)
-            guard ret == 0 else { return nil }
+            guard ret == 0 else { return false }
             ret = av_hwframe_transfer_data(self.frame, self.hwFrame, 0)
-            guard ret == 0 else { return nil }
+            guard ret == 0 else { return false }
         } else {
             ret = avcodec_receive_frame(codecContext, frame)
         }
-        guard ret == 0 else { return nil }
+        guard ret == 0 else { return false }
         frame!.pointee.pts = packet.pointee.pts
-        av_frame_unref(outputFrame)
-        guard filter.getTargetFormatFrame(inputFrame: frame!, outputFrame: &(outputFrame!)) else { return nil }
-        print("读取到视频帧: \(Double(outputFrame!.pointee.pts) * av_q2d(stream.pointee.time_base))")
-        return outputFrame
+        av_frame_unref(outputFrame.pointee)
+        guard filter.getTargetFormatFrame(inputFrame: frame!, outputFrame: outputFrame) else { return false }
+//        print("读取到视频帧: \(Double(outputFrame!.pointee.pts) * av_q2d(stream.pointee.time_base))")
+        return true
     }
 }

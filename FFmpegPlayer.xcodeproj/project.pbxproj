@@ -25,6 +25,11 @@
 		A05BAA3825B06CEF00AEC9A4 /* MetalKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A05BAA2E25B06BFD00AEC9A4 /* MetalKit.framework */; };
 		A05BAA3D25B06D9700AEC9A4 /* Shaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = A05BAA3C25B06D9700AEC9A4 /* Shaders.metal */; };
 		A05BAA3E25B06D9700AEC9A4 /* Shaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = A05BAA3C25B06D9700AEC9A4 /* Shaders.metal */; };
+		A09CF27425B9524600732211 /* FFCacheQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = A09CF27325B9524600732211 /* FFCacheQueue.swift */; };
+		A09CF27825B953B600732211 /* FFAudioCacheObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = A09CF27725B953B600732211 /* FFAudioCacheObject.swift */; };
+		A09CF27C25B953BF00732211 /* FFVideoCacheObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = A09CF27B25B953BF00732211 /* FFVideoCacheObject.swift */; };
+		A09CF28025B9560400732211 /* FFVideoPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A09CF27F25B9560400732211 /* FFVideoPlayer.swift */; };
+		A09CF28825B96A9400732211 /* FFAudioInformation.swift in Sources */ = {isa = PBXBuildFile; fileRef = A09CF28725B96A9400732211 /* FFAudioInformation.swift */; };
 		A09F424225A2B877001E4BCA /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = A09F424125A2B877001E4BCA /* AppDelegate.m */; };
 		A09F424525A2B877001E4BCA /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A09F424425A2B877001E4BCA /* ViewController.m */; };
 		A09F424725A2B878001E4BCA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A09F424625A2B878001E4BCA /* Assets.xcassets */; };
@@ -110,6 +115,11 @@
 		A05BAA2E25B06BFD00AEC9A4 /* MetalKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MetalKit.framework; path = System/Library/Frameworks/MetalKit.framework; sourceTree = SDKROOT; };
 		A05BAA3225B06C0400AEC9A4 /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = System/Library/Frameworks/Metal.framework; sourceTree = SDKROOT; };
 		A05BAA3C25B06D9700AEC9A4 /* Shaders.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; path = Shaders.metal; sourceTree = "<group>"; };
+		A09CF27325B9524600732211 /* FFCacheQueue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FFCacheQueue.swift; sourceTree = "<group>"; };
+		A09CF27725B953B600732211 /* FFAudioCacheObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FFAudioCacheObject.swift; sourceTree = "<group>"; };
+		A09CF27B25B953BF00732211 /* FFVideoCacheObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FFVideoCacheObject.swift; sourceTree = "<group>"; };
+		A09CF27F25B9560400732211 /* FFVideoPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FFVideoPlayer.swift; sourceTree = "<group>"; };
+		A09CF28725B96A9400732211 /* FFAudioInformation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FFAudioInformation.swift; sourceTree = "<group>"; };
 		A09F423D25A2B877001E4BCA /* FFmpegPlayer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FFmpegPlayer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A09F424025A2B877001E4BCA /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		A09F424125A2B877001E4BCA /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -374,6 +384,24 @@
 				A05BAA3C25B06D9700AEC9A4 /* Shaders.metal */,
 			);
 			path = metal;
+			sourceTree = "<group>";
+		};
+		A09CF27125B951FF00732211 /* utils */ = {
+			isa = PBXGroup;
+			children = (
+				A09CF27325B9524600732211 /* FFCacheQueue.swift */,
+				A09CF27725B953B600732211 /* FFAudioCacheObject.swift */,
+				A09CF27B25B953BF00732211 /* FFVideoCacheObject.swift */,
+			);
+			path = utils;
+			sourceTree = "<group>";
+		};
+		A09CF27225B9520700732211 /* audio */ = {
+			isa = PBXGroup;
+			children = (
+				A09CF28725B96A9400732211 /* FFAudioInformation.swift */,
+			);
+			path = audio;
 			sourceTree = "<group>";
 		};
 		A09F423425A2B877001E4BCA = {
@@ -673,7 +701,6 @@
 				A09F438325A30B70001E4BCA /* FFMediaVideoContext.mm */,
 				A09F438725A30B7C001E4BCA /* FFMediaAudioContext.h */,
 				A09F438825A30B7C001E4BCA /* FFMediaAudioContext.mm */,
-				A02A93BB25B66C4700CAD2BA /* FFAudioInformation.h */,
 				A09F447A25A4660B001E4BCA /* FFFilter.h */,
 				A09F447B25A4660B001E4BCA /* FFFilter.mm */,
 			);
@@ -701,6 +728,8 @@
 		A09F436525A3016F001E4BCA /* player */ = {
 			isa = PBXGroup;
 			children = (
+				A09CF27225B9520700732211 /* audio */,
+				A09CF27125B951FF00732211 /* utils */,
 				A09F449525A560D6001E4BCA /* video */,
 				A09F436625A30181001E4BCA /* FFPlayer.swift */,
 				A09F444C25A33F31001E4BCA /* FFEngine.swift */,
@@ -755,6 +784,7 @@
 				A09F449A25A5615B001E4BCA /* FFRGBRender.swift */,
 				A0286A7C25A831FF00ACBD99 /* FFOpenGLRender.swift */,
 				BEEF90A8E689CA0F78500E71 /* FFMetalRender.swift */,
+				A09CF27F25B9560400732211 /* FFVideoPlayer.swift */,
 			);
 			path = video;
 			sourceTree = "<group>";
@@ -764,6 +794,7 @@
 			children = (
 				A0CCD32425B29C2B0054C379 /* FFAudioQueuePlayer.h */,
 				A0CCD32525B29C2B0054C379 /* FFAudioQueuePlayer.mm */,
+				A02A93BB25B66C4700CAD2BA /* FFAudioInformation.h */,
 			);
 			path = Audio;
 			sourceTree = "<group>";
@@ -918,17 +949,22 @@
 			buildActionMask = 2147483647;
 			files = (
 				A09F425E25A2B8A5001E4BCA /* ViewController.swift in Sources */,
+				A09CF27C25B953BF00732211 /* FFVideoCacheObject.swift in Sources */,
 				A09F449725A560EB001E4BCA /* FFVideoRender.swift in Sources */,
+				A09CF27825B953B600732211 /* FFAudioCacheObject.swift in Sources */,
 				A09F436725A30181001E4BCA /* FFPlayer.swift in Sources */,
 				A09F425C25A2B8A5001E4BCA /* AppDelegate.swift in Sources */,
 				A09F449B25A5615B001E4BCA /* FFRGBRender.swift in Sources */,
+				A09CF27425B9524600732211 /* FFCacheQueue.swift in Sources */,
 				A09F445125A33F48001E4BCA /* FFMediaVideoContext.swift in Sources */,
 				A0286A7D25A831FF00ACBD99 /* FFOpenGLRender.swift in Sources */,
 				A09F449225A553DD001E4BCA /* FFFilter.swift in Sources */,
 				A05BAA3E25B06D9700AEC9A4 /* Shaders.metal in Sources */,
 				A09F444D25A33F31001E4BCA /* FFEngine.swift in Sources */,
 				A09F445525A33F58001E4BCA /* FFMediaAudioContext.swift in Sources */,
+				A09CF28025B9560400732211 /* FFVideoPlayer.swift in Sources */,
 				BEEF9411522BC4C1B4892145 /* FFMetalRender.swift in Sources */,
+				A09CF28825B96A9400732211 /* FFAudioInformation.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -8,6 +8,9 @@
 #include <libavfilter/buffersrc.h>
 #include <libavfilter/buffersink.h>
 #include <libavutil/opt.h>
+#include <libavutil/error.h>
+
+static int READ_END_OF_FILE = AVERROR_EOF;
 
 #define GL_SILENCE_DEPRECATION
 #include <OpenGL/gl3.h>

@@ -13,6 +13,7 @@ class FFMediaAudioContext {
     private let formatContext: UnsafeMutablePointer<AVFormatContext>!
     private var codec: UnsafeMutablePointer<AVCodec>!
     private var codecContext: UnsafeMutablePointer<AVCodecContext>!
+    public var audioInformation: FFAudioInformation!
     
     deinit {
         if(self.codecContext != nil) {
@@ -45,10 +46,18 @@ class FFMediaAudioContext {
         print("Channel Layout: \(codecContext.pointee.channel_layout)");
         print("Decodec: \(String.init(cString: codec.pointee.long_name))");
         print("=========================================================");
+        
         return true
     }
 }
 
 extension FFMediaAudioContext {
     public var streamIndex: Int { return Int(self.stream.pointee.index) }
+    public func onFrameDuration() -> Double {
+        let frameSize = Double(codecContext.pointee.frame_size)
+        let bytesPerFrame = Double(av_get_bytes_per_sample(codecContext.pointee.sample_fmt))
+        let channels = Double(codecContext.pointee.channels)
+        let sampleRate = Double(codecContext.pointee.sample_rate)
+        return frameSize * bytesPerFrame * channels / sampleRate
+    }
 }
