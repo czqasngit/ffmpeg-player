@@ -8,19 +8,19 @@
 import Foundation
 
 class FFAudioCacheObject {
-    private var length: Int
+    private var length: UInt32
     private let data: UnsafeMutablePointer<UInt8>
     
     deinit {
         self.data.deallocate()
     }
-    init(length: Int) {
-        self.data = UnsafeMutablePointer<UInt8>.allocate(capacity: length)
+    init(length: UInt32) {
+        self.data = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(length))
         self.length = length
     }
 }
 extension FFAudioCacheObject {
     public func getCacheData() -> UnsafeMutablePointer<UInt8> { self.data }
-    public func getCacheLength() -> Int { self.length }
-    public func setCacheLength(_ length: Int) { self.length = length }
+    public func getCacheLength() -> UInt32 { self.length }
+    public func setCacheLength(_ length: UInt32) { self.length = length }
 }

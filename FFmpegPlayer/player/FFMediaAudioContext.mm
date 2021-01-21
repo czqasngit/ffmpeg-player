@@ -19,16 +19,20 @@
     AVCodecContext *codecContext;
     int streamIndex;
     struct SwrContext *au_convert_ctx;
+    AVFrame *frame;
 }
 
 - (void)dealloc {
     if(au_convert_ctx) swr_free(&au_convert_ctx);
+    av_frame_unref(frame);
+    av_frame_free(&frame);
 }
 - (instancetype)initWithAVStream:(AVStream *)stream formatContext:(nonnull AVFormatContext *)formatContext {
     self = [super init];
     if(self) {
         self->stream = stream;
         self->formatContext = formatContext;
+        frame = av_frame_alloc();
         if(![self setup]) {
             return NULL;
         }
@@ -91,17 +95,15 @@ fail:
 - (BOOL)decodePacket:(AVPacket *)packet outBuffer:(uint8_t **)buffer outBufferSize:(int64_t *)outBufferSize {
     int ret = avcodec_send_packet(self->codecContext, packet);
     if(ret != 0) return NO;
-    AVFrame *frame = av_frame_alloc();
+    av_frame_unref(frame);
     ret = avcodec_receive_frame(self->codecContext, frame);
     if(ret != 0) {
         av_frame_unref(frame);
-        av_frame_free(&frame);
         return NO;
     }
     ret = swr_convert(au_convert_ctx, buffer, frame->nb_samples, (const uint8_t **)frame->data, frame->nb_samples);
     *outBufferSize = ret * self.audioInformation.bytesPerSample;
     av_frame_unref(frame);
-    av_frame_free(&frame);
     return YES;
 }
 - (FFAudioInformation)audioInformation {

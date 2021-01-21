@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import AudioToolbox
 
 private let MIN_AUDIO_CACHE_DURATION: Double  = 1
 private let MAX_AUDIO_CACHE_DURATION: Double = 2
@@ -25,6 +26,7 @@ class FFEngine {
     
     private let render: FFVideoRender
     private var videoPlayer: FFVideoPlayer?
+    private var audioPlayer: FFAudioPlayer?
     private var formatContext:UnsafeMutablePointer<AVFormatContext>!
     private var videoContext: FFMediaVideoContext?
     private var audioContext: FFMediaAudioContext?
@@ -73,6 +75,7 @@ class FFEngine {
                     return false
                 }
                 self.audioContext = ac
+                self.audioPlayer = .init(ac.audioInformation, self)
             }
         }
         return true
@@ -98,9 +101,11 @@ extension FFEngine {
     func start() {
         self.decode()
         self.videoPlayer?.startPlay()
+        self.audioPlayer?.play()
     }
     func stop() {
         self.videoPlayer?.stopPlay()
+        self.audioPlayer?.stop()
     }
 }
 extension FFEngine {
@@ -155,7 +160,17 @@ extension FFEngine {
                         }
                     } else if let audioContext = self.audioContext,
                               self.packet!.pointee.stream_index == audioContext.streamIndex {
-                        
+                        if let avctx = self.audioContext {
+                            let obj = FFAudioCacheObject.init(length: UInt32(avctx.audioInformation.bufferSize))
+                            var outBufferSize: UInt32 = 0
+                            var outBuffer: UnsafeMutablePointer<UInt8>! = obj.getCacheData()
+                            if avctx.decode(packet: self.packet!, outBuffer: &outBuffer, outBufferSize: &outBufferSize) {
+                                self.audioCacheQueue.enqueue(obj)
+                                if self.audioCanKeepMoving() {
+                                    _Wakeup(cond: self.audioCondition)
+                                }
+                            }
+                        }
                     }
                 } else {
                     if ret == READ_END_OF_FILE {
@@ -191,6 +206,27 @@ extension FFEngine : FFVideoPlayerProtocol {
                     print("Video frame render completed.")
                     self.videoPlayer?.stopPlay()
                 }
+            }
+        }
+    }
+}
+extension FFEngine : FFAudioPlayerProtocol {
+    func readNextAudioFrame(_ aqBuffer: AudioQueueBufferRef) {
+        self.audioPlayQueue.async {
+            pthread_mutex_lock(&(self.mutex))
+            let _decodecComplete = self.decodeCompleted
+            pthread_mutex_unlock(&(self.mutex))
+            if self.audioRequireWait() && !_decodecComplete {
+                _Wakeup(cond: self.decodeCondition)
+                _Sleep(cond: self.audioCondition)
+            }
+            if let obj = self.audioCacheQueue.dequeue() {
+                self.audioPlayer?.receive(data: obj.getCacheData(), length: obj.getCacheLength(), aqBuffer: aqBuffer)
+                if !self.hasEnoughAudio() {
+                    _Wakeup(cond: self.decodeCondition)
+                }
+            } else {
+                
             }
         }
     }

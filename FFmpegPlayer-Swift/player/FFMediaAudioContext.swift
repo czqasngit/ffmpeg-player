@@ -13,13 +13,17 @@ class FFMediaAudioContext {
     private let formatContext: UnsafeMutablePointer<AVFormatContext>!
     private var codec: UnsafeMutablePointer<AVCodec>!
     private var codecContext: UnsafeMutablePointer<AVCodecContext>!
+    private var frame = av_frame_alloc()
     public var audioInformation: FFAudioInformation!
+    private var swrCtx: OpaquePointer!
     
     deinit {
         if(self.codecContext != nil) {
             avcodec_close(self.codecContext)
             avcodec_free_context(&codecContext)
         }
+        av_frame_unref(frame)
+        av_frame_free(&frame)
     }
     public init?(stream: UnsafeMutablePointer<AVStream>?,
                  formatContext: UnsafeMutablePointer<AVFormatContext>?) {
@@ -64,6 +68,19 @@ class FFMediaAudioContext {
                                       bytesPerSample: bytesPerSample)
         return true
     }
+    private func setupSwr() {
+        let channel_layout = audioInformation.channels == 1 ? AV_CH_LAYOUT_MONO : AV_CH_LAYOUT_STEREO;
+        self.swrCtx = swr_alloc_set_opts(nil,
+                                         Int64(channel_layout),
+                                         self.audioInformation.format,
+                                         Int32(self.audioInformation.rate),
+                                         Int64(self.codecContext.pointee.channel_layout),
+                                         self.codecContext.pointee.sample_fmt,
+                                         Int32(self.codecContext.pointee.sample_rate),
+                                         0,
+                                         nil)
+        swr_init(self.swrCtx)
+    }
 }
 
 extension FFMediaAudioContext {
@@ -74,5 +91,20 @@ extension FFMediaAudioContext {
         let channels = Double(codecContext.pointee.channels)
         let sampleRate = Double(codecContext.pointee.sample_rate)
         return frameSize * bytesPerFrame * channels / sampleRate
+    }
+}
+
+extension FFMediaAudioContext {
+    public func decode(packet: UnsafeMutablePointer<AVPacket>, outBuffer: UnsafeMutablePointer<UnsafeMutablePointer<UInt8>?>, outBufferSize:UnsafeMutablePointer<UInt32>) -> Bool {
+        var ret = avcodec_send_packet(self.codecContext, packet)
+        guard ret == 0 else { return false }
+        av_frame_unref(frame)
+        ret = avcodec_receive_frame(self.codecContext, frame)
+        guard ret == 0 else { return false }
+        let p = getPointer(frame)
+        let size = swr_convert(self.swrCtx, outBuffer, frame!.pointee.nb_samples, p, frame!.pointee.nb_samples)
+        outBufferSize.pointee = UInt32(size) * UInt32(self.audioInformation.bytesPerSample)
+        av_frame_unref(frame)
+        return true
     }
 }
