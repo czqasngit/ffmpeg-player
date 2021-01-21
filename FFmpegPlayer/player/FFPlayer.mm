@@ -29,7 +29,7 @@
 
 #pragma mark -
 - (BOOL)setupPlayer:(const char *)url enableHWDecode:(BOOL)enableHWDecode {
-    BOOL ret = [_engine setup:url enableHWDecode:enableHWDecode];
+    BOOL ret = [_engine play:url enableHWDecode:enableHWDecode];
     if(!ret) return NO;
     
     return YES;
@@ -43,6 +43,9 @@
         return NO;
     }
     return YES;
+}
+- (void)stop {
+    [_engine stop];
 }
 - (NSView *)renderView {
     return (id)self.videoRender;

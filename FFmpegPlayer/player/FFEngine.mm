@@ -19,20 +19,31 @@
 #define MAX_VIDEO_FRAME_DURATION   2
 #define MIN_VIDEO_FRAME_DURATION   1
 
+NS_INLINE void _NotifyWaitThreadWakeUp(NSCondition *condition) {
+    /// To prevent current thread wait lead to wake up signal can’t reache to sleeping thread.
+    /// Send signal dispatch on main thread.
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    dispatch_async(queue, ^{
+        [condition signal];
+    });
+}
 
+NS_INLINE void _SleepThread(NSCondition *condition) {
+    [condition wait];
+}
 
 @interface FFEngine()
 @property (nonatomic, strong)FFMediaVideoContext *mediaVideoContext;
 @property (nonatomic, strong)FFMediaAudioContext *mediaAudioContext;
 @property (nonatomic, strong)FFAudioQueuePlayer *audioPlayer;
 @property (nonatomic, strong)FFVideoPlayer *videoPlayer;
+@property (nonatomic, strong)id<FFVideoRender> videoRender;
 @property (nonatomic, strong)NSCondition *decodeCondition;
 @property (nonatomic, strong)NSCondition *audioPlayCondition;
 @property (nonatomic, strong)NSCondition *videoRenderCondition;
 @property (nonatomic, strong)FFObjectQueue *videoFrameCacheQueue;
 @property (nonatomic, strong)FFObjectQueue *audioFrameCacheQueue;
 @property (nonatomic, assign, getter=isDecodeComplete)BOOL decodeComplete;
-@property (nonatomic, strong)id<FFVideoRender> videoRender;
 @end
 @implementation FFEngine {
     AVFormatContext *formatContext;
@@ -97,7 +108,7 @@
     }
     return YES;
 }
-- (BOOL)setup:(const char *)url enableHWDecode:(BOOL)enableHWDecode {
+- (BOOL)play:(const char *)url enableHWDecode:(BOOL)enableHWDecode {
     /// formatContet: AVFormatContext,保存了音视频文件信息
     /// url: 需要打开的音视频文件地址
     /// fmt: 指定打开的音视频文件的格式,如果不指定则自动推导
@@ -111,6 +122,7 @@
     if(ret < 0) goto fail;
     if(formatContext->nb_streams == 0) goto fail;
     if(![self setupMediaContextWithEnableHWDecode:enableHWDecode]) goto fail;
+    /// reset decode state
     self.decodeComplete = NO;
     /// start decode thread and audio play thread and video play thread
     [self decode];
@@ -122,6 +134,10 @@ fail:
         avformat_close_input(&formatContext);
     }
     return NO;
+}
+- (void)stop {
+    [self stopVideoPlay];
+    [self stopAudioPlay];
 }
 @end
 
@@ -136,7 +152,7 @@ fail:
             if((!self.mediaAudioContext || audioCacheDuration >= MAX_AUDIO_FRAME_DURATION) &&
                (!self.mediaVideoContext || videoCacheDuration >= MAX_VIDEO_FRAME_DURATION)) {
                 NSLog(@"Decode wait...");
-                [self.decodeCondition wait];
+                _SleepThread(self.decodeCondition);
                 NSLog(@"Decode resume");
             }
             av_packet_unref(self->packet);
@@ -154,9 +170,7 @@ fail:
                         /// 通知视频渲染队列可以继续渲染了
                         /// 如果视频渲染队列未暂停则无作用
                         if(videoCacheDuration >= MIN_VIDEO_FRAME_DURATION) {
-                            dispatch_async(dispatch_get_main_queue(), ^{
-                                [self.videoRenderCondition signal];
-                            });
+                            _NotifyWaitThreadWakeUp(self.videoRenderCondition);
                         }
                     }
                 } else if(self.mediaAudioContext && self->packet->stream_index == self.mediaAudioContext.streamIndex) {
@@ -174,9 +188,7 @@ fail:
                         /// 通知音频渲染队列可以继续渲染了
                         /// 如果音频渲染队列未暂停则无作用
                         if(audioCacheDuration >= MIN_AUDIO_FRAME_DURATION) {
-                            dispatch_async(dispatch_get_main_queue(), ^{
-                                [self.audioPlayCondition signal];
-                            });
+                            _NotifyWaitThreadWakeUp(self.audioPlayCondition);
                         }
                     }
                 }
@@ -232,12 +244,12 @@ fail:
         pthread_mutex_unlock(&(self->mutex));
         if(videoCacheDuration < MIN_VIDEO_FRAME_DURATION && !isDecodeComplete) {
             NSLog(@"Video is not enough, wait...");
-            [self.decodeCondition signal];
-            [self.videoRenderCondition wait];
+            _NotifyWaitThreadWakeUp(self.decodeCondition);
+            _SleepThread(self.videoRenderCondition);
         }
         FFQueueVideoObject *obj = [self.videoFrameCacheQueue dequeue];
         if(videoCacheDuration < MAX_VIDEO_FRAME_DURATION) {
-            [self.decodeCondition signal];
+            _NotifyWaitThreadWakeUp(self.decodeCondition);
         }
         if(obj) {
             [self.videoPlayer renderFrame:obj.frame];
@@ -261,16 +273,12 @@ fail:
         pthread_mutex_unlock(&(self->mutex));
         if(audioCacheDuration < MIN_AUDIO_FRAME_DURATION && !isDecodeComplete) {
             NSLog(@"Audio is not enough, wait…");
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [self.decodeCondition signal];
-            });
-            [self.audioPlayCondition wait];
+            _NotifyWaitThreadWakeUp(self.decodeCondition);
+            _SleepThread(self.audioPlayCondition);
         }
         FFQueueAudioObject *obj = [self.audioFrameCacheQueue dequeue];
         if(audioCacheDuration < MAX_AUDIO_FRAME_DURATION) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [self.decodeCondition signal];
-            });
+            _NotifyWaitThreadWakeUp(self.decodeCondition);
         }
         if(obj) {
             [self.audioPlayer receiveData:obj.data length:obj.length aqBuffer:aqBuffer];

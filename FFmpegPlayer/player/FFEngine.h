@@ -19,7 +19,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface FFEngine : NSObject
 - (instancetype)initWithVideoRender:(id<FFVideoRender>)videoRender;
-- (BOOL)setup:(const char *)url enableHWDecode:(BOOL)enableHWDecode;
+- (BOOL)play:(const char *)url enableHWDecode:(BOOL)enableHWDecode;
+- (void)stop;
 @end
 
 @interface FFEngine (Control)
@@ -28,9 +29,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)startAudioPlay;
 - (void)stopAudioPlay;
 @end
+
 @interface FFEngine (Decode)
 - (void)decode;
 @end
+
 @interface FFEngine (Video)<FFVideoPlayerDelegate>
 @end
 

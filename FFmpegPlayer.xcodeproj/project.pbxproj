@@ -741,9 +741,9 @@
 				A0286A6725A830B100ACBD99 /* FFOpenGLRender.mm */,
 				A09F447025A464D8001E4BCA /* FFRGBRender.h */,
 				A09F447125A464D8001E4BCA /* FFRGBRender.mm */,
-				A09F447525A4651D001E4BCA /* FFVideoRender.h */,
 				A0E4858825B7D6EC00E73DF0 /* FFVideoPlayer.h */,
 				A0E4858925B7D6EC00E73DF0 /* FFVideoPlayer.mm */,
+				A09F447525A4651D001E4BCA /* FFVideoRender.h */,
 			);
 			path = Video;
 			sourceTree = "<group>";
