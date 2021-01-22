@@ -13,7 +13,7 @@ protocol FFAudioPlayerProtocol {
 }
 func audioQueueCallBack(inUserData: UnsafeMutableRawPointer?, audioQueue: AudioQueueRef, aqBuffer: AudioQueueBufferRef) {
     guard let inUserData = inUserData else { return }
-    let player = Unmanaged<FFAudioPlayer>.fromOpaque(inUserData).takeRetainedValue()
+    let player = Unmanaged<FFAudioPlayer>.fromOpaque(inUserData).takeUnretainedValue()
     player.reuseAQBuffer(aqBuffer)
 }
 class FFAudioPlayer {
@@ -30,7 +30,6 @@ class FFAudioPlayer {
                 let p = CFArrayGetValueAtIndex(self.buffers, $0).bindMemory(to: AudioQueueBuffer.self, capacity: 1)
                 let aqBuffer = AudioQueueBufferRef.init(mutating: p)
                 AudioQueueFreeBuffer(audioQueue, aqBuffer)
-                
             }
         }
         CFArrayRemoveAllValues(self.buffers)
@@ -68,8 +67,8 @@ class FFAudioPlayer {
 }
 extension FFAudioPlayer {
     public func reuseAQBuffer(_ aqBuffer: AudioQueueBufferRef) {
-        self.delegate.readNextAudioFrame(aqBuffer)
         print("[AudioPlayer]Reuse AQ Buffer")
+        self.delegate.readNextAudioFrame(aqBuffer)
     }
 }
 extension FFAudioPlayer {

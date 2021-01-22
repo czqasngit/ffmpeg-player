@@ -111,7 +111,7 @@ extension FFEngine {
 extension FFEngine {
     func hasEnoughAudio() -> Bool {
         return true
-        guard let audioContext = self.audioContext else { return true }
+        guard let audioContext = self.audioContext else { return false }
         return Double(self.audioCacheQueue.count()) * audioContext.onFrameDuration() >= MAX_AUDIO_CACHE_DURATION
     }
     func audioCanKeepMoving() -> Bool {
@@ -123,7 +123,7 @@ extension FFEngine {
         return Double(self.audioCacheQueue.count()) * audioContext.onFrameDuration() < MIN_AUDIO_CACHE_DURATION
     }
     func hasEnoughVideo() -> Bool {
-        guard let videoContext = self.videoContext else { return true }
+        guard let videoContext = self.videoContext else { return false }
         return Double(self.videoCacheQueue.count()) * videoContext.onFrameDuration() >= MAX_VIDEO_CACHE_DURATION
     }
     func videoCanKeepMoving() -> Bool {
@@ -165,6 +165,7 @@ extension FFEngine {
                             var outBufferSize: UInt32 = 0
                             var outBuffer: UnsafeMutablePointer<UInt8>! = obj.getCacheData()
                             if avctx.decode(packet: self.packet!, outBuffer: &outBuffer, outBufferSize: &outBufferSize) {
+                                obj.setCacheLength(outBufferSize)
                                 self.audioCacheQueue.enqueue(obj)
                                 if self.audioCanKeepMoving() {
                                     _Wakeup(cond: self.audioCondition)
@@ -222,12 +223,14 @@ extension FFEngine : FFAudioPlayerProtocol {
                 _Sleep(cond: self.audioCondition)
             }
             if let obj = self.audioCacheQueue.dequeue() {
+                print("[AudioPlayer]dequeue")
                 self.audioPlayer?.receive(data: obj.getCacheData(), length: obj.getCacheLength(), aqBuffer: aqBuffer)
                 if !self.hasEnoughAudio() {
                     _Wakeup(cond: self.decodeCondition)
                 }
             } else {
                 if _decodecComplete {
+                    print("Audio frame play completed.")
                     self.audioPlayer?.stop()
                 }
             }
