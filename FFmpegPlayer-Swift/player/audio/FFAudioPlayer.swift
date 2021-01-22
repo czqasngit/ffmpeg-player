@@ -23,6 +23,7 @@ class FFAudioPlayer {
     private var audioQueue: AudioQueueRef?
     private var buffers: CFMutableArray!
     private let maxBufferCount = 3
+    
     deinit {
         if let audioQueue = self.audioQueue {
             AudioQueueDispose(audioQueue, true)
@@ -54,13 +55,11 @@ class FFAudioPlayer {
         let ret = AudioQueueNewOutput(&(self.absd), audioQueueCallBack, p, nil, nil, 0, &audioQueue)
         guard ret == errSecSuccess else { return false }
         self.buffers = CFArrayCreateMutable(kCFAllocatorDefault, maxBufferCount, nil)
-        (0..<maxBufferCount).forEach {
-            _ in
+        (0..<maxBufferCount).forEach { _ in
             var aqBuffer: AudioQueueBufferRef? = nil
             let status = AudioQueueAllocateBuffer(self.audioQueue!, UInt32(self.audioInformation.bufferSize), &aqBuffer)
-            if status == errSecSuccess {
-                CFArrayAppendValue(self.buffers, aqBuffer)
-            }
+            guard status == errSecSuccess else  { fatalError() }
+            CFArrayAppendValue(self.buffers, aqBuffer)
         }
         return true
     }
@@ -71,6 +70,7 @@ extension FFAudioPlayer {
         self.delegate.readNextAudioFrame(aqBuffer)
     }
 }
+// MARK: - Control
 extension FFAudioPlayer {
     public func play() {
         guard let audioQueue = self.audioQueue else { return }
@@ -86,6 +86,8 @@ extension FFAudioPlayer {
         AudioQueueStop(audioQueue, true)
     }
 }
+
+// MARK: - 
 extension FFAudioPlayer {
     public func receive(data: UnsafeMutablePointer<UInt8>, length: UInt32, aqBuffer: AudioQueueBufferRef) {
         guard let audioQueue = self.audioQueue else { return }

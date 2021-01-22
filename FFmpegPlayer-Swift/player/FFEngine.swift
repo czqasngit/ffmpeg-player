@@ -108,9 +108,9 @@ extension FFEngine {
         self.audioPlayer?.stop()
     }
 }
+//MARK: - Utility
 extension FFEngine {
     func hasEnoughAudio() -> Bool {
-        return true
         guard let audioContext = self.audioContext else { return false }
         return Double(self.audioCacheQueue.count()) * audioContext.onFrameDuration() >= MAX_AUDIO_CACHE_DURATION
     }
@@ -134,8 +134,8 @@ extension FFEngine {
         guard let videoContext = self.videoContext else { return false }
         return Double(self.videoCacheQueue.count()) * videoContext.onFrameDuration() < MIN_VIDEO_CACHE_DURATION
     }
-    
 }
+// MARK: - Decode
 extension FFEngine {
     private func decode() {
         decodeQueue.async {
@@ -186,7 +186,7 @@ extension FFEngine {
         }
     }
 }
-
+// MARK: - FFVideoPlayerProtocol
 extension FFEngine : FFVideoPlayerProtocol {
     func readNextVideoFrame() {
         self.videoRenderQueue.async {
@@ -211,6 +211,7 @@ extension FFEngine : FFVideoPlayerProtocol {
         }
     }
 }
+//MARK : - FFAudioPlayerProtocol
 extension FFEngine : FFAudioPlayerProtocol {
     func readNextAudioFrame(_ aqBuffer: AudioQueueBufferRef) {
         print("[AudioPlayer]readNextAudioFrame")
