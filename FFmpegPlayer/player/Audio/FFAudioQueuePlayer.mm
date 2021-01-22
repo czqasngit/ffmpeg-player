@@ -109,6 +109,4 @@ static void _AudioQueueOutputCallback(void *inUserData, AudioQueueRef inAQ, Audi
     AudioQueueStop(audioQueue, YES);
 }
 
-#pragma mark - Public
-
 @end

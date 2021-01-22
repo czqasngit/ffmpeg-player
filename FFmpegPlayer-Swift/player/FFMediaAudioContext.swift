@@ -31,6 +31,7 @@ class FFMediaAudioContext {
         self.stream = stream
         self.formatContext = formatContext
         if(!setup()) { return nil }
+        setupSwr()
     }
     // MARK: -
     private func setup() -> Bool {

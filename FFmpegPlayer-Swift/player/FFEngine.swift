@@ -187,7 +187,7 @@ extension FFEngine {
 }
 
 extension FFEngine : FFVideoPlayerProtocol {
-    func readNextFrame() {
+    func readNextVideoFrame() {
         self.videoRenderQueue.async {
             pthread_mutex_lock(&(self.mutex))
             let _decodecComplete = self.decodeCompleted
@@ -212,6 +212,7 @@ extension FFEngine : FFVideoPlayerProtocol {
 }
 extension FFEngine : FFAudioPlayerProtocol {
     func readNextAudioFrame(_ aqBuffer: AudioQueueBufferRef) {
+        print("[AudioPlayer]readNextAudioFrame")
         self.audioPlayQueue.async {
             pthread_mutex_lock(&(self.mutex))
             let _decodecComplete = self.decodeCompleted
@@ -226,7 +227,9 @@ extension FFEngine : FFAudioPlayerProtocol {
                     _Wakeup(cond: self.decodeCondition)
                 }
             } else {
-                
+                if _decodecComplete {
+                    self.audioPlayer?.stop()
+                }
             }
         }
     }

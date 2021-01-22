@@ -13,8 +13,8 @@ protocol FFAudioPlayerProtocol {
 }
 func audioQueueCallBack(inUserData: UnsafeMutableRawPointer?, audioQueue: AudioQueueRef, aqBuffer: AudioQueueBufferRef) {
     guard let inUserData = inUserData else { return }
-    let this = inUserData.bindMemory(to: FFAudioPlayer.self, capacity: 1).pointee
-    this.reuseAQBuffer(aqBuffer)
+    let player = Unmanaged<FFAudioPlayer>.fromOpaque(inUserData).takeRetainedValue()
+    player.reuseAQBuffer(aqBuffer)
 }
 class FFAudioPlayer {
     private var absd: AudioStreamBasicDescription
@@ -22,11 +22,18 @@ class FFAudioPlayer {
     private let audioInformation: FFAudioInformation
     private var audioQueue: AudioQueueRef?
     private var buffers: CFMutableArray!
-    
+    private let maxBufferCount = 3
     deinit {
         if let audioQueue = self.audioQueue {
             AudioQueueDispose(audioQueue, true)
+            (0..<maxBufferCount).forEach {
+                let p = CFArrayGetValueAtIndex(self.buffers, $0).bindMemory(to: AudioQueueBuffer.self, capacity: 1)
+                let aqBuffer = AudioQueueBufferRef.init(mutating: p)
+                AudioQueueFreeBuffer(audioQueue, aqBuffer)
+                
+            }
         }
+        CFArrayRemoveAllValues(self.buffers)
     }
     init(_ audioInformation: FFAudioInformation, _ delegate: FFAudioPlayerProtocol) {
         self.audioInformation = audioInformation
@@ -40,14 +47,15 @@ class FFAudioPlayer {
                                                      mBitsPerChannel: UInt32(audioInformation.bitsPerChannel),
                                                      mReserved: 0)
         self.delegate = delegate
+        _  = setupAudioQueue()
     }
     //MARK: -
     private func setupAudioQueue() -> Bool {
-        var this = self
-        let ret = AudioQueueNewOutput(&(self.absd), audioQueueCallBack, &this, nil, nil, 0, &audioQueue)
+        let p = unsafeBitCast(self, to: UnsafeMutableRawPointer.self)
+        let ret = AudioQueueNewOutput(&(self.absd), audioQueueCallBack, p, nil, nil, 0, &audioQueue)
         guard ret == errSecSuccess else { return false }
-        self.buffers = CFArrayCreateMutable(kCFAllocatorDefault, 3, nil)
-        (0...2).forEach {
+        self.buffers = CFArrayCreateMutable(kCFAllocatorDefault, maxBufferCount, nil)
+        (0..<maxBufferCount).forEach {
             _ in
             var aqBuffer: AudioQueueBufferRef? = nil
             let status = AudioQueueAllocateBuffer(self.audioQueue!, UInt32(self.audioInformation.bufferSize), &aqBuffer)
@@ -61,14 +69,16 @@ class FFAudioPlayer {
 extension FFAudioPlayer {
     public func reuseAQBuffer(_ aqBuffer: AudioQueueBufferRef) {
         self.delegate.readNextAudioFrame(aqBuffer)
+        print("[AudioPlayer]Reuse AQ Buffer")
     }
 }
 extension FFAudioPlayer {
     public func play() {
         guard let audioQueue = self.audioQueue else { return }
         AudioQueueStart(audioQueue, nil)
-        (0...(CFArrayGetCount(self.buffers))).forEach {
-            let aqBuffer = CFArrayGetValueAtIndex(self.buffers, $0).load(as: AudioQueueBufferRef.self)
+        (0..<maxBufferCount).forEach {
+            let p = CFArrayGetValueAtIndex(self.buffers, $0)
+            let aqBuffer = AudioQueueBufferRef.init(mutating: p!.bindMemory(to: AudioQueueBuffer.self, capacity: 1))
             self.delegate.readNextAudioFrame(aqBuffer)
         }
     }
@@ -83,5 +93,6 @@ extension FFAudioPlayer {
         aqBuffer.pointee.mAudioDataByteSize = length
         memcpy(aqBuffer.pointee.mAudioData, data, Int(length))
         AudioQueueEnqueueBuffer(audioQueue, aqBuffer, 0, nil)
+        print("[AudioPlayer]Receive audio data: \(length)")
     }
 }

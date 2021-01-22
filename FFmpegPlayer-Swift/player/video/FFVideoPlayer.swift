@@ -8,7 +8,7 @@
 import Foundation
 
 protocol FFVideoPlayerProtocol {
-    func readNextFrame()
+    func readNextVideoFrame()
 }
 class FFVideoPlayer {
     private let videoRenderQueue: DispatchQueue
@@ -44,7 +44,7 @@ extension FFVideoPlayer {
 extension FFVideoPlayer {
 
     private func timerHandler() {
-        self.delegate.readNextFrame()
+        self.delegate.readNextVideoFrame()
     }
     public func startPlay() {
         if let timer = self.timer {
