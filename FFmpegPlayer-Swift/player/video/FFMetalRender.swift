@@ -125,7 +125,7 @@ class FFMetalRender: MTKView, FFVideoRender {
                 let threadsPerThreadgroup = MTLSize.init(width: (yWidth + threadgroupPerGrid.width - 1) / threadgroupPerGrid.width,
                                                     height: (yHeight + threadgroupPerGrid.height - 1) / threadgroupPerGrid.height,
                                                     depth: 1)
-                commandEncoder.dispatchThreadgroups(threadgroupPerGrid, threadsPerThreadgroup: threadsPerThreadgroup)
+                commandEncoder.dispatchThreadgroups(threadsPerThreadgroup, threadsPerThreadgroup: threadgroupPerGrid)
                 commandEncoder.endEncoding()
                 commandBuffer.addScheduledHandler { _ in
                     yMetalTexture = nil

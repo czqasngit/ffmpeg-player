@@ -14,6 +14,8 @@
 		A0286A7825A831E900ACBD99 /* yuv_fragment.glsl in Resources */ = {isa = PBXBuildFile; fileRef = A0286A7225A8316100ACBD99 /* yuv_fragment.glsl */; };
 		A0286A7925A831E900ACBD99 /* vertex.glsl in Resources */ = {isa = PBXBuildFile; fileRef = A0286A7325A8316200ACBD99 /* vertex.glsl */; };
 		A0286A7D25A831FF00ACBD99 /* FFOpenGLRender.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0286A7C25A831FF00ACBD99 /* FFOpenGLRender.swift */; };
+		A029476625BC750900AEE93B /* 1080.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = A029476525BC750900AEE93B /* 1080.mp4 */; };
+		A029476725BC750900AEE93B /* 1080.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = A029476525BC750900AEE93B /* 1080.mp4 */; };
 		A02A93C225B6802F00CAD2BA /* FFQueueVideoObject.mm in Sources */ = {isa = PBXBuildFile; fileRef = A02A93C125B6802F00CAD2BA /* FFQueueVideoObject.mm */; };
 		A02A93C625B6B6C300CAD2BA /* flutter.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = A02A93C525B6B6C300CAD2BA /* flutter.mp4 */; };
 		A02A93C725B6B6C300CAD2BA /* flutter.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = A02A93C525B6B6C300CAD2BA /* flutter.mp4 */; };
@@ -106,6 +108,7 @@
 		A0286A7225A8316100ACBD99 /* yuv_fragment.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = yuv_fragment.glsl; sourceTree = "<group>"; };
 		A0286A7325A8316200ACBD99 /* vertex.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = vertex.glsl; sourceTree = "<group>"; };
 		A0286A7C25A831FF00ACBD99 /* FFOpenGLRender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FFOpenGLRender.swift; sourceTree = "<group>"; };
+		A029476525BC750900AEE93B /* 1080.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = 1080.mp4; sourceTree = "<group>"; };
 		A02A93BB25B66C4700CAD2BA /* FFAudioInformation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FFAudioInformation.h; sourceTree = "<group>"; };
 		A02A93C025B6802F00CAD2BA /* FFQueueVideoObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FFQueueVideoObject.h; sourceTree = "<group>"; };
 		A02A93C125B6802F00CAD2BA /* FFQueueVideoObject.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = FFQueueVideoObject.mm; sourceTree = "<group>"; };
@@ -750,6 +753,7 @@
 				A0286A7125A8315A00ACBD99 /* glsl */,
 				A09F437925A30758001E4BCA /* audio.mp3 */,
 				A09F437425A3074D001E4BCA /* 1280x720.mp4 */,
+				A029476525BC750900AEE93B /* 1080.mp4 */,
 				A02A93C525B6B6C300CAD2BA /* flutter.mp4 */,
 				A02A93CC25B6B78800CAD2BA /* short.mp4 */,
 			);
@@ -899,6 +903,7 @@
 				A09F437525A3074D001E4BCA /* 1280x720.mp4 in Resources */,
 				A02A93C625B6B6C300CAD2BA /* flutter.mp4 in Resources */,
 				A09F424725A2B878001E4BCA /* Assets.xcassets in Resources */,
+				A029476625BC750900AEE93B /* 1080.mp4 in Resources */,
 				A0286A7525A8316200ACBD99 /* vertex.glsl in Resources */,
 				A09F424A25A2B879001E4BCA /* Main.storyboard in Resources */,
 				A09F437A25A30758001E4BCA /* audio.mp3 in Resources */,
@@ -914,6 +919,7 @@
 				A09F437625A3074D001E4BCA /* 1280x720.mp4 in Resources */,
 				A02A93C725B6B6C300CAD2BA /* flutter.mp4 in Resources */,
 				A09F426025A2B8A6001E4BCA /* Assets.xcassets in Resources */,
+				A029476725BC750900AEE93B /* 1080.mp4 in Resources */,
 				A0286A7925A831E900ACBD99 /* vertex.glsl in Resources */,
 				A09F426325A2B8A6001E4BCA /* Main.storyboard in Resources */,
 				A09F437B25A30758001E4BCA /* audio.mp3 in Resources */,
