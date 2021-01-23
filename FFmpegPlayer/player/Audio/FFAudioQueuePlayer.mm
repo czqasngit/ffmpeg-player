@@ -68,7 +68,7 @@ static void _AudioQueueOutputCallback(void *inUserData, AudioQueueRef inAQ, Audi
     /// kLinearPCMFormatFlagIsSignedInteger: 存储的数据类型
     /// kAudioFormatFlagIsPacked: 数据交叉排列
     asbd.mFormatFlags = kLinearPCMFormatFlagIsSignedInteger | kAudioFormatFlagIsPacked;
-    asbd.mReserved = NO;
+    asbd.mReserved = 0;
     OSStatus status = AudioQueueNewOutput(&asbd,
                                           _AudioQueueOutputCallback,
                                           (__bridge void *)self,
