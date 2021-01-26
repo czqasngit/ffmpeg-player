@@ -17,7 +17,10 @@ NS_ASSUME_NONNULL_BEGIN
 @interface FFAudioQueuePlayer : NSObject
 - (instancetype)initWithAudioInformation:(FFAudioInformation)audioInformation
                                 delegate:(id<FFAudioQueuePlayerDelegate>)delegate;
-- (void)receiveData:(uint8_t *)data length:(int64_t)length aqBuffer:(AudioQueueBufferRef)aqBuffer;
+- (void)receiveData:(uint8_t *)data length:(int64_t)length
+           aqBuffer:(AudioQueueBufferRef)aqBuffer
+                pts:(float)pts
+           duration:(float)duration;
 - (void)reuseAudioQueueBuffer:(AudioQueueBufferRef)aqBuffer;
 - (void)play;
 - (void)stop;

@@ -177,7 +177,8 @@ fail:
                     uint64_t duration = self->formatContext->streams[self.mediaAudioContext.streamIndex]->duration;
                     NSLog(@"【PTS】【Audio】: %lld, duration: %lld, last: %lld", self->packet->pts, duration, self->packet->duration);
                     int buffer_size = self.mediaAudioContext.audioInformation.buffer_size;
-                    FFQueueAudioObject *obj = [[FFQueueAudioObject alloc] initWithLength:buffer_size];
+                    float unit = av_q2d(self.mediaAudioContext.codecContext->time_base);
+                    FFQueueAudioObject *obj = [[FFQueueAudioObject alloc] initWithLength:buffer_size pts:self->packet->pts * unit duration:self->packet->duration * unit];
                     uint8_t *buffer = obj.data;
                     int64_t bufferSize = 0;
                     BOOL ret = [self.mediaAudioContext decodePacket:self->packet outBuffer:&buffer outBufferSize:&bufferSize];
@@ -281,7 +282,7 @@ fail:
             _NotifyWaitThreadWakeUp(self.decodeCondition);
         }
         if(obj) {
-            [self.audioPlayer receiveData:obj.data length:obj.length aqBuffer:aqBuffer];
+            [self.audioPlayer receiveData:obj.data length:obj.length aqBuffer:aqBuffer pts:obj.pts duration:obj.duration];
         } else {
             if(isDecodeComplete) {
                 NSLog(@"Audio frame play completed.");

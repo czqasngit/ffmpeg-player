@@ -91,11 +91,16 @@ static void _AudioQueueOutputCallback(void *inUserData, AudioQueueRef inAQ, Audi
 }
 
 #pragma mark - Public
-- (void)receiveData:(uint8_t *)data length:(int64_t)length aqBuffer:(AudioQueueBufferRef)aqBuffer {
+- (void)receiveData:(uint8_t *)data
+             length:(int64_t)length
+           aqBuffer:(AudioQueueBufferRef)aqBuffer
+                pts:(float)pts
+           duration:(float)duration {
     if(!data || !aqBuffer) return;
     aqBuffer->mAudioDataByteSize = (int)length;
     memcpy(aqBuffer->mAudioData, data, length);
     AudioQueueEnqueueBuffer(self->audioQueue, aqBuffer, 0, NULL);
+    NSLog(@"[播放]: %f, 时长: %f", pts, duration);
 }
 - (void)play {
     AudioQueueStart(audioQueue, NULL);

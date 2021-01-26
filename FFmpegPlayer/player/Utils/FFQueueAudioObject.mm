@@ -14,9 +14,11 @@
 - (void)dealloc {
     free(self->data);
 }
-- (instancetype)initWithLength:(int)length {
+- (instancetype)initWithLength:(int64_t)length pts:(float)pts duration:(float)duration {
     self = [super init];
     if (self) {
+        _pts = pts;
+        _duration = duration;
         self->length = length;
         self->data = (uint8_t *)malloc(length);
     }
@@ -25,7 +27,7 @@
 - (uint8_t *)data {
     return self->data;
 }
-- (int)length {
+- (int64_t)length {
     return self->length;
 }
 - (void)updateLength:(int64_t)length {
