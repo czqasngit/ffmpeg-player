@@ -14,15 +14,21 @@
 @implementation FFVideoPlayer {
     dispatch_source_t video_render_timer;
     dispatch_queue_t video_render_dispatch_queue;
+    AVCodecContext *avctx;
+    AVStream *stream;
 }
 
 - (instancetype)initWithQueue:(dispatch_queue_t)queue
                        render:(nonnull id<FFVideoRender>)videoRender
                           fps:(int)fps
+                        avctx:(AVCodecContext *)avctx
+                       stream:(AVStream *)stream
                      delegate:(id<FFVideoPlayerDelegate>)delegate {
     self = [super init];
     if (self) {
         self->video_render_dispatch_queue = queue;
+        self->avctx = avctx;
+        self->stream = stream;
         self.fps = fps;
         self.render = videoRender;
         self.delegate = delegate;
@@ -60,6 +66,10 @@
 }
 - (void)renderFrame:(AVFrame *)frame {
     [self.render displayWithFrame:frame];
+    float unit = av_q2d(self->stream->time_base);
+    float pts = unit * frame->pts;
+    float duration = frame->pkt_duration * unit;
+    [self.delegate updateVideoClock:pts duration:duration];
 }
 - (AVPixelFormat)pixelFormat {
     return [self.render pixelFormat];

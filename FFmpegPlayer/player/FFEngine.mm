@@ -53,6 +53,8 @@ NS_INLINE void _SleepThread(NSCondition *condition) {
     AVPacket *packet;
     /// lock shared variate
     pthread_mutex_t mutex;
+    double video_clock;
+    double audio_clock;
 }
 - (void)dealloc {
     if(formatContext) {
@@ -73,6 +75,8 @@ NS_INLINE void _SleepThread(NSCondition *condition) {
         self->audio_play_dispatch_queue = dispatch_queue_create("audio play queue", DISPATCH_QUEUE_SERIAL);
         self->video_render_dispatch_queue = dispatch_queue_create("video render queue", DISPATCH_QUEUE_SERIAL);
         self->packet = av_packet_alloc();
+        self->video_clock = 0;
+        self->audio_clock = 0;
         pthread_mutex_init(&mutex, NULL);
         self.decodeCondition = [[NSCondition alloc] init];
         self.audioPlayCondition = [[NSCondition alloc] init];
@@ -97,6 +101,8 @@ NS_INLINE void _SleepThread(NSCondition *condition) {
             self.videoPlayer = [[FFVideoPlayer alloc] initWithQueue:self->video_render_dispatch_queue
                                                              render:self.videoRender
                                                                 fps:[self.mediaVideoContext fps]
+                                                              avctx:self.mediaVideoContext.codecContext
+                                                             stream:stream
                                                            delegate:(id)self];
         } else if(mediaType == AVMEDIA_TYPE_AUDIO) {
             _mediaAudioContext = [[FFMediaAudioContext alloc] initWithAVStream:stream
@@ -124,16 +130,20 @@ NS_INLINE void _SleepThread(NSCondition *condition) {
     if(![self setupMediaContextWithEnableHWDecode:enableHWDecode]) goto fail;
     /// reset decode state
     self.decodeComplete = NO;
-    /// start decode thread and audio play thread and video play thread
-    [self decode];
-    [self startAudioPlay];
-    [self startVideoPlay];
+    [self start];
     return YES;
 fail:
     if(formatContext) {
         avformat_close_input(&formatContext);
     }
     return NO;
+}
+- (void)start {
+    [self decode];
+    self->audio_clock = 0;
+    self->video_clock = 0;
+    [self startAudioPlay];
+    [self startVideoPlay];
 }
 - (void)stop {
     [self stopVideoPlay];
@@ -262,6 +272,12 @@ fail:
         }
     });
 }
+- (void)updateVideoClock:(float)pts duration:(float)duration {
+    pthread_mutex_lock(&mutex);
+    self->video_clock = pts + duration;
+    NSLog(@"[Clock]: %f - %f", self->audio_clock, self->video_clock);
+    pthread_mutex_unlock(&mutex);
+}
 @end
 
 
@@ -290,5 +306,11 @@ fail:
             }
         }
     });
+}
+- (void)updateAudioClock:(float)pts duration:(float)duration {
+    pthread_mutex_lock(&mutex);
+    self->audio_clock = pts +duration;
+    NSLog(@"[Clock]: %f - %f", self->audio_clock, self->video_clock);
+    pthread_mutex_unlock(&mutex);
 }
 @end

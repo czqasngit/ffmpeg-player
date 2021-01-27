@@ -13,6 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol FFAudioQueuePlayerDelegate <NSObject>
 - (void)readNextAudioFrame:(AudioQueueBufferRef)aqBuffer;
+- (void)updateAudioClock:(float)pts duration:(float)duration;
 @end
 @interface FFAudioQueuePlayer : NSObject
 - (instancetype)initWithAudioInformation:(FFAudioInformation)audioInformation

@@ -16,12 +16,15 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol FFVideoPlayerDelegate <NSObject>
 - (void)readNextVideoFrame;
+- (void)updateVideoClock:(float)pts duration:(float)duration;
 @end
 @interface FFVideoPlayer : NSObject
 @property (nonatomic, weak)id<FFVideoPlayerDelegate> delegate;
 - (instancetype)initWithQueue:(dispatch_queue_t)queue
-                       render:(id<FFVideoRender>)videoRender
+                       render:(nonnull id<FFVideoRender>)videoRender
                           fps:(int)fps
+                        avctx:(AVCodecContext *)avctx
+                       stream:(AVStream *)stream
                      delegate:(id<FFVideoPlayerDelegate>)delegate;
 - (void)renderFrame:(AVFrame *)frame;
 - (void)startPlay;
