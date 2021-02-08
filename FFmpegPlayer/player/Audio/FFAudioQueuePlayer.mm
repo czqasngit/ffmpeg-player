@@ -100,7 +100,7 @@ static void _AudioQueueOutputCallback(void *inUserData, AudioQueueRef inAQ, Audi
     aqBuffer->mAudioDataByteSize = (int)length;
     memcpy(aqBuffer->mAudioData, data, length);
     AudioQueueEnqueueBuffer(self->audioQueue, aqBuffer, 0, NULL);
-    NSLog(@"[播放]: %f, 时长: %f", pts, duration);
+//    NSLog(@"[播放]: %f, 时长: %f", pts, duration);
     [self.delegate updateAudioClock:pts duration:duration];
 }
 - (void)play {

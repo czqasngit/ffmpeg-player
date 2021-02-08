@@ -13,6 +13,9 @@ extern "C" {
 NS_ASSUME_NONNULL_BEGIN
 
 @interface FFQueueVideoObject : NSObject
+@property (nonatomic, assign)double unit;
+@property (nonatomic, assign)double pts;
+@property (nonatomic, assign)double duration;
 - (instancetype)init;
 - (AVFrame *)frame;
 @end

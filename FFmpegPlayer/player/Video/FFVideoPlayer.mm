@@ -65,10 +65,10 @@
     [self stopVideoRender];
 }
 - (void)renderFrame:(AVFrame *)frame {
-    [self.render displayWithFrame:frame];
     float unit = av_q2d(self->stream->time_base);
     float pts = unit * frame->pts;
     float duration = frame->pkt_duration * unit;
+    [self.render displayWithFrame:frame];
     [self.delegate updateVideoClock:pts duration:duration];
 }
 - (AVPixelFormat)pixelFormat {

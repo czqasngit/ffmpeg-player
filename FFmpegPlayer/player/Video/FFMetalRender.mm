@@ -83,6 +83,7 @@
 }
 
 - (CVPixelBufferRef)createCVPixelBufferFromAVFrame:(AVFrame *)frame {
+//    CFTimeInterval start = CACurrentMediaTime();
     if(![self setupCVPixelBufferIfNeed:frame]) return NULL;
     CVPixelBufferRef _pixelBufferRef;
     CVReturn cvRet = CVPixelBufferPoolCreatePixelBuffer(kCFAllocatorDefault, pixelBufferPoolRef, &_pixelBufferRef);
@@ -100,6 +101,8 @@
     size_t uvBytesPerRowSize = CVPixelBufferGetBytesPerRowOfPlane(_pixelBufferRef, 1);
     memcpy(uvBase, frame->data[1], uvBytesPerRowSize * frame->height / 2);
     CVPixelBufferUnlockBaseAddress(_pixelBufferRef, 0);
+    CFTimeInterval end = CACurrentMediaTime();
+//    NSLog(@"耗时: %f", end - start);
     return _pixelBufferRef;
 }
 

@@ -32,6 +32,14 @@ NS_INLINE void _SleepThread(NSCondition *condition) {
     [condition wait];
 }
 
+typedef NS_ENUM(NSInteger, FFPlayState) {
+    FFPlayStateNone,
+    FFPlayStateLoading,
+    FFPlayStatePlaying,
+    FFPlayStatePause,
+    FFPlayStateStop
+};
+
 @interface FFEngine()
 @property (nonatomic, strong)FFMediaVideoContext *mediaVideoContext;
 @property (nonatomic, strong)FFMediaAudioContext *mediaAudioContext;
@@ -44,6 +52,7 @@ NS_INLINE void _SleepThread(NSCondition *condition) {
 @property (nonatomic, strong)FFObjectQueue *videoFrameCacheQueue;
 @property (nonatomic, strong)FFObjectQueue *audioFrameCacheQueue;
 @property (nonatomic, assign, getter=isDecodeComplete)BOOL decodeComplete;
+@property (nonatomic, assign)FFPlayState playState;
 @end
 @implementation FFEngine {
     AVFormatContext *formatContext;
@@ -54,6 +63,7 @@ NS_INLINE void _SleepThread(NSCondition *condition) {
     /// lock shared variate
     pthread_mutex_t mutex;
     double video_clock;
+    double sync_duration;
     double audio_clock;
 }
 - (void)dealloc {
@@ -76,6 +86,7 @@ NS_INLINE void _SleepThread(NSCondition *condition) {
         self->video_render_dispatch_queue = dispatch_queue_create("video render queue", DISPATCH_QUEUE_SERIAL);
         self->packet = av_packet_alloc();
         self->video_clock = 0;
+        self->sync_duration = 0;
         self->audio_clock = 0;
         pthread_mutex_init(&mutex, NULL);
         self.decodeCondition = [[NSCondition alloc] init];
@@ -86,33 +97,6 @@ NS_INLINE void _SleepThread(NSCondition *condition) {
         self.videoRender = videoRender;
     }
     return self;
-}
-
-- (BOOL)setupMediaContextWithEnableHWDecode:(BOOL)enableHWDecode {
-    for(int i = 0; i < formatContext->nb_streams; i ++) {
-        AVStream *stream = formatContext->streams[i];
-        AVMediaType mediaType = stream->codecpar->codec_type;
-        if(mediaType == AVMEDIA_TYPE_VIDEO) {
-            _mediaVideoContext = [[FFMediaVideoContext alloc] initWithAVStream:stream
-                                                                 formatContext:formatContext
-                                                                           fmt:[self.videoRender pixelFormat]
-                                                                enableHWDecode:enableHWDecode];
-            if(!_mediaVideoContext) return NO;
-            self.videoPlayer = [[FFVideoPlayer alloc] initWithQueue:self->video_render_dispatch_queue
-                                                             render:self.videoRender
-                                                                fps:[self.mediaVideoContext fps]
-                                                              avctx:self.mediaVideoContext.codecContext
-                                                             stream:stream
-                                                           delegate:(id)self];
-        } else if(mediaType == AVMEDIA_TYPE_AUDIO) {
-            _mediaAudioContext = [[FFMediaAudioContext alloc] initWithAVStream:stream
-                                                                 formatContext:formatContext];
-            if(!_mediaAudioContext) return NO;
-            self.audioPlayer = [[FFAudioQueuePlayer alloc] initWithAudioInformation:_mediaAudioContext.audioInformation
-                                                                           delegate:(id)self];
-        }
-    }
-    return YES;
 }
 - (BOOL)play:(const char *)url enableHWDecode:(BOOL)enableHWDecode {
     /// formatContet: AVFormatContext,保存了音视频文件信息
@@ -138,12 +122,40 @@ fail:
     }
     return NO;
 }
+- (BOOL)setupMediaContextWithEnableHWDecode:(BOOL)enableHWDecode {
+    self.playState = FFPlayStateNone;
+    for(int i = 0; i < formatContext->nb_streams; i ++) {
+        AVStream *stream = formatContext->streams[i];
+        AVMediaType mediaType = stream->codecpar->codec_type;
+        if(mediaType == AVMEDIA_TYPE_VIDEO) {
+            _mediaVideoContext = [[FFMediaVideoContext alloc] initWithAVStream:stream
+                                                                 formatContext:formatContext
+                                                                           fmt:[self.videoRender pixelFormat]
+                                                                enableHWDecode:enableHWDecode];
+            if(!_mediaVideoContext) return NO;
+            self.videoPlayer = [[FFVideoPlayer alloc] initWithQueue:self->video_render_dispatch_queue
+                                                             render:self.videoRender
+                                                                fps:[self.mediaVideoContext fps]
+                                                              avctx:self.mediaVideoContext.codecContext
+                                                             stream:stream
+                                                           delegate:(id)self];
+            self->sync_duration = 1.0f / av_q2d(stream->avg_frame_rate);
+        } else if(mediaType == AVMEDIA_TYPE_AUDIO) {
+            _mediaAudioContext = [[FFMediaAudioContext alloc] initWithAVStream:stream
+                                                                 formatContext:formatContext];
+            if(!_mediaAudioContext) return NO;
+            self.audioPlayer = [[FFAudioQueuePlayer alloc] initWithAudioInformation:_mediaAudioContext.audioInformation
+                                                                           delegate:(id)self];
+        }
+    }
+    return YES;
+}
 - (void)start {
+    self.playState = FFPlayStateLoading;
     [self decode];
     self->audio_clock = 0;
     self->video_clock = 0;
-    [self startAudioPlay];
-    [self startVideoPlay];
+    
 }
 - (void)stop {
     [self stopVideoPlay];
@@ -162,6 +174,11 @@ fail:
             if((!self.mediaAudioContext || audioCacheDuration >= MAX_AUDIO_FRAME_DURATION) &&
                (!self.mediaVideoContext || videoCacheDuration >= MAX_VIDEO_FRAME_DURATION)) {
                 NSLog(@"Decode wait...");
+                if(self.playState == FFPlayStateLoading) {
+                    self.playState = FFPlayStatePlaying;
+                    [self startAudioPlay];
+                    [self startVideoPlay];
+                }
                 _SleepThread(self.decodeCondition);
                 NSLog(@"Decode resume");
             }
@@ -171,9 +188,13 @@ fail:
                 if(self.mediaVideoContext && self->packet->stream_index == self.mediaVideoContext.streamIndex) {
                     uint64_t duration = self->formatContext->streams[self.mediaVideoContext.streamIndex]->duration;
                     FFQueueVideoObject *obj = [[FFQueueVideoObject alloc] init];
+                    float unit = av_q2d(self->formatContext->streams[self.mediaVideoContext.streamIndex]->time_base);
+                    obj.unit = unit;
                     AVFrame *frame = obj.frame;
                     BOOL ret = [self.mediaVideoContext decodePacket:self->packet frame:&frame];
-                    NSLog(@"【PTS】【Video】: %lld, duration: %lld, last: %lld, repeat: %d", frame->pts, duration, self->packet->duration, frame->repeat_pict);
+                    obj.pts = obj.frame->pts * unit;
+                    obj.duration = self->sync_duration;
+                    NSLog(@"【PTS】【Video】: %f, duration: %lld, last: %lld, repeat: %d", frame->pts * unit, duration, self->packet->duration, frame->repeat_pict);
                     if(ret) {
                         [self.videoFrameCacheQueue enqueue:obj];
                         videoCacheDuration = [self.videoFrameCacheQueue count] * [self.mediaVideoContext oneFrameDuration];
@@ -185,9 +206,9 @@ fail:
                     }
                 } else if(self.mediaAudioContext && self->packet->stream_index == self.mediaAudioContext.streamIndex) {
                     uint64_t duration = self->formatContext->streams[self.mediaAudioContext.streamIndex]->duration;
-                    NSLog(@"【PTS】【Audio】: %lld, duration: %lld, last: %lld", self->packet->pts, duration, self->packet->duration);
-                    int buffer_size = self.mediaAudioContext.audioInformation.buffer_size;
                     float unit = av_q2d(self.mediaAudioContext.codecContext->time_base);
+                    NSLog(@"【PTS】【Audio】: %f, duration: %lld, last: %lld", self->packet->pts * unit, duration, self->packet->duration);
+                    int buffer_size = self.mediaAudioContext.audioInformation.buffer_size;
                     FFQueueAudioObject *obj = [[FFQueueAudioObject alloc] initWithLength:buffer_size pts:self->packet->pts * unit duration:self->packet->duration * unit];
                     uint8_t *buffer = obj.data;
                     int64_t bufferSize = 0;
@@ -258,7 +279,30 @@ fail:
             _NotifyWaitThreadWakeUp(self.decodeCondition);
             _SleepThread(self.videoRenderCondition);
         }
-        FFQueueVideoObject *obj = [self.videoFrameCacheQueue dequeue];
+        pthread_mutex_lock(&(self->mutex));
+        double ac = self->audio_clock;
+        pthread_mutex_unlock(&(self->mutex));
+        FFQueueVideoObject *obj = NULL;
+        int readCount = 0;
+        obj = [self.videoFrameCacheQueue dequeue];
+        readCount ++;
+        if(ac - (obj.pts + obj.duration) > self->sync_duration) {
+            while ((obj.pts + obj.duration) > self->sync_duration) {
+                obj = [self.videoFrameCacheQueue dequeue];
+                readCount ++;
+            }
+        } else if (ac - (obj.pts + obj.duration) < -self->sync_duration) {
+            while (ac - (obj.pts + obj.duration) < -self->sync_duration) {
+                sleep(self->sync_duration);
+                NSLog(@"[Sync]睡:%f", self->sync_duration);
+                pthread_mutex_lock(&(self->mutex));
+                ac = self->audio_clock;
+                pthread_mutex_unlock(&(self->mutex));
+            }
+        } else {
+            obj = [self.videoFrameCacheQueue dequeue];
+        }
+        NSLog(@"[Sync]视频与音频的时间差: %f, 跳过%d帧", obj.pts + obj.duration - ac, readCount - 1);
         if(videoCacheDuration < MAX_VIDEO_FRAME_DURATION) {
             _NotifyWaitThreadWakeUp(self.decodeCondition);
         }
@@ -309,7 +353,7 @@ fail:
 }
 - (void)updateAudioClock:(float)pts duration:(float)duration {
     pthread_mutex_lock(&mutex);
-    self->audio_clock = pts +duration;
+    self->audio_clock = pts + duration;
     NSLog(@"[Clock]: %f - %f", self->audio_clock, self->video_clock);
     pthread_mutex_unlock(&mutex);
 }
