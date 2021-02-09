@@ -45,9 +45,8 @@
         dispatch_source_cancel(self->video_render_timer);
     }
     self->video_render_timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, video_render_dispatch_queue);
-    dispatch_source_set_timer(self->video_render_timer, dispatch_walltime(NULL, 0),
-                              1.0 / self.fps * NSEC_PER_SEC,
-                              1.0 / self.fps * NSEC_PER_SEC);
+    float duration = 1.0 / self.fps * NSEC_PER_SEC;
+    dispatch_source_set_timer(self->video_render_timer, DISPATCH_TIME_NOW, duration, duration);
     dispatch_source_set_event_handler(self->video_render_timer, ^{
         [self playNextVideoFrame];
     });

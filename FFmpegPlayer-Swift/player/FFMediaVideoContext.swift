@@ -95,7 +95,8 @@ class FFMediaVideoContext {
 extension FFMediaVideoContext {
     public var streamIndex: Int { Int(self.stream.pointee.index) }
     public var fps: Double { av_q2d(self.stream.pointee.avg_frame_rate) }
-    public func onFrameDuration() -> Double { 1.0 / av_q2d(stream.pointee.avg_frame_rate) }
+    public func oneFrameDuration() -> Double { 1.0 / av_q2d(stream.pointee.avg_frame_rate) }
+    public func getStream() -> UnsafeMutablePointer<AVStream> { self.stream }
     public func decode(packet: UnsafeMutablePointer<AVPacket>,
                        outputFrame: UnsafeMutablePointer<UnsafeMutablePointer<AVFrame>>) -> Bool {
         var ret = avcodec_send_packet(codecContext, packet)
@@ -111,7 +112,9 @@ extension FFMediaVideoContext {
             ret = avcodec_receive_frame(codecContext, frame)
         }
         guard ret == 0 else { return false }
-        frame!.pointee.pts = packet.pointee.pts
+        if(frame!.pointee.pts == PTS_INVALID) {
+            frame!.pointee.pts = self.hwFrame.pointee.pts
+        }
         av_frame_unref(outputFrame.pointee)
         guard filter.getTargetFormatFrame(inputFrame: frame!, outputFrame: outputFrame) else { return false }
 //        print("读取到视频帧: \(Double(outputFrame!.pointee.pts) * av_q2d(stream.pointee.time_base))")

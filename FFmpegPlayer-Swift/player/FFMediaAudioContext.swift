@@ -86,13 +86,14 @@ class FFMediaAudioContext {
 
 extension FFMediaAudioContext {
     public var streamIndex: Int { return Int(self.stream.pointee.index) }
-    public func onFrameDuration() -> Double {
+    public func oneFrameDuration() -> Double {
         let frameSize = Double(codecContext.pointee.frame_size)
         let bytesPerFrame = Double(av_get_bytes_per_sample(codecContext.pointee.sample_fmt))
         let channels = Double(codecContext.pointee.channels)
         let sampleRate = Double(codecContext.pointee.sample_rate)
         return frameSize * bytesPerFrame * channels / sampleRate
     }
+    public var timeBase: AVRational { return self.codecContext.pointee.time_base }
 }
 
 extension FFMediaAudioContext {

@@ -13,13 +13,11 @@ class ViewController: NSViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        if let url = Bundle.main.path(forResource: "1280x720", ofType: "mp4") {
+        if let url = Bundle.main.path(forResource: "flutter", ofType: "mp4") {
             _ = self.player.play(url: url, enableHWDecode: true)
         }
         self.view.addSubview(self.player.displayRender)
         self.player.displayRender.frame = .init(x: 0, y: 0, width: 1280, height: 720)
     }
-
-
 }
 

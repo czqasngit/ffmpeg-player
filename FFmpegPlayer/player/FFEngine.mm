@@ -63,7 +63,7 @@ typedef NS_ENUM(NSInteger, FFPlayState) {
     /// lock shared variate
     pthread_mutex_t mutex;
     double video_clock;
-    double sync_duration;
+    double tolerance_scope;
     double audio_clock;
 }
 - (void)dealloc {
@@ -86,7 +86,7 @@ typedef NS_ENUM(NSInteger, FFPlayState) {
         self->video_render_dispatch_queue = dispatch_queue_create("video render queue", DISPATCH_QUEUE_SERIAL);
         self->packet = av_packet_alloc();
         self->video_clock = 0;
-        self->sync_duration = 0;
+        self->tolerance_scope = 0;
         self->audio_clock = 0;
         pthread_mutex_init(&mutex, NULL);
         self.decodeCondition = [[NSCondition alloc] init];
@@ -139,7 +139,7 @@ fail:
                                                               avctx:self.mediaVideoContext.codecContext
                                                              stream:stream
                                                            delegate:(id)self];
-            self->sync_duration = 1.0f / av_q2d(stream->avg_frame_rate);
+            self->tolerance_scope = 1.0f / av_q2d(stream->avg_frame_rate);
         } else if(mediaType == AVMEDIA_TYPE_AUDIO) {
             _mediaAudioContext = [[FFMediaAudioContext alloc] initWithAVStream:stream
                                                                  formatContext:formatContext];
@@ -193,7 +193,7 @@ fail:
                     AVFrame *frame = obj.frame;
                     BOOL ret = [self.mediaVideoContext decodePacket:self->packet frame:&frame];
                     obj.pts = obj.frame->pts * unit;
-                    obj.duration = self->sync_duration;
+                    obj.duration = [self.mediaVideoContext oneFrameDuration];
                     NSLog(@"【PTS】【Video】: %f, duration: %lld, last: %lld, repeat: %d", frame->pts * unit, duration, self->packet->duration, frame->repeat_pict);
                     if(ret) {
                         [self.videoFrameCacheQueue enqueue:obj];
@@ -268,6 +268,36 @@ fail:
 
 
 @implementation FFEngine (VideoPlay)
+- (FFQueueVideoObject *_Nullable)_readNextVideoFrameBySyncAudio {
+    pthread_mutex_lock(&(self->mutex));
+    /// Current audio frame play end time.
+    double ac = self->audio_clock;
+    pthread_mutex_unlock(&(self->mutex));
+    FFQueueVideoObject *obj = NULL;
+    int readCount = 0;
+    /// Read next video frame
+    obj = [self.videoFrameCacheQueue dequeue];
+    readCount ++;
+    double vc = obj.pts + obj.duration;
+    NSLog(@"[Sync] AC: %f, VC: %f, 差值: %f, syncDuration: %f", ac, vc, abs(ac - vc), self->tolerance_scope);
+    if(ac - vc > self->tolerance_scope) {
+        while (ac - vc > self->tolerance_scope) {
+            FFQueueVideoObject *_nextObj = [self.videoFrameCacheQueue dequeue];
+            if(!_nextObj) break;
+            obj = _nextObj;
+            vc = obj.pts + obj.duration;
+            readCount ++;
+        }
+        NSLog(@"[Sync]音频太快,视频追赶跳过: %d 帧", (readCount - 1));
+    } else if (vc - ac > self->tolerance_scope) {
+        float sleep_time = vc - ac;
+        NSLog(@"[Sync]视频太快,视频等待:%f", sleep_time);
+        usleep(sleep_time * 1000 * 1000);
+    } else {
+        NSLog(@"[Sync]音频在误差允许范围内: %f, %f", abs(ac - vc), self->tolerance_scope);
+    }
+    return obj;
+}
 - (void)readNextVideoFrame {
     dispatch_async(video_render_dispatch_queue, ^{
         float videoCacheDuration = [self.videoFrameCacheQueue count] * [self.mediaVideoContext oneFrameDuration];
@@ -279,33 +309,10 @@ fail:
             _NotifyWaitThreadWakeUp(self.decodeCondition);
             _SleepThread(self.videoRenderCondition);
         }
-        pthread_mutex_lock(&(self->mutex));
-        double ac = self->audio_clock;
-        pthread_mutex_unlock(&(self->mutex));
-        FFQueueVideoObject *obj = NULL;
-        int readCount = 0;
-        obj = [self.videoFrameCacheQueue dequeue];
-        readCount ++;
-        if(ac - (obj.pts + obj.duration) > self->sync_duration) {
-            while ((obj.pts + obj.duration) > self->sync_duration) {
-                obj = [self.videoFrameCacheQueue dequeue];
-                readCount ++;
-            }
-        } else if (ac - (obj.pts + obj.duration) < -self->sync_duration) {
-            while (ac - (obj.pts + obj.duration) < -self->sync_duration) {
-                sleep(self->sync_duration);
-                NSLog(@"[Sync]睡:%f", self->sync_duration);
-                pthread_mutex_lock(&(self->mutex));
-                ac = self->audio_clock;
-                pthread_mutex_unlock(&(self->mutex));
-            }
-        } else {
-            obj = [self.videoFrameCacheQueue dequeue];
-        }
-        NSLog(@"[Sync]视频与音频的时间差: %f, 跳过%d帧", obj.pts + obj.duration - ac, readCount - 1);
         if(videoCacheDuration < MAX_VIDEO_FRAME_DURATION) {
             _NotifyWaitThreadWakeUp(self.decodeCondition);
         }
+        FFQueueVideoObject *obj = [self _readNextVideoFrameBySyncAudio];
         if(obj) {
             [self.videoPlayer renderFrame:obj.frame];
         } else {
@@ -319,7 +326,6 @@ fail:
 - (void)updateVideoClock:(float)pts duration:(float)duration {
     pthread_mutex_lock(&mutex);
     self->video_clock = pts + duration;
-    NSLog(@"[Clock]: %f - %f", self->audio_clock, self->video_clock);
     pthread_mutex_unlock(&mutex);
 }
 @end
@@ -354,7 +360,6 @@ fail:
 - (void)updateAudioClock:(float)pts duration:(float)duration {
     pthread_mutex_lock(&mutex);
     self->audio_clock = pts + duration;
-    NSLog(@"[Clock]: %f - %f", self->audio_clock, self->video_clock);
     pthread_mutex_unlock(&mutex);
 }
 @end

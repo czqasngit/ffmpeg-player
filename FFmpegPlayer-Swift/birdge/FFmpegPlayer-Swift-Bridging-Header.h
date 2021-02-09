@@ -10,9 +10,10 @@
 #include <libavutil/opt.h>
 #include <libavutil/error.h>
 #include <libswresample/swresample.h>
+#include <libavutil/avutil.h>
 
 static int READ_END_OF_FILE = AVERROR_EOF;
-
+static int64_t PTS_INVALID = AV_NOPTS_VALUE;
 static const uint8_t ** getPointer(AVFrame *frame) {
     return (const uint8_t **)frame->data;
 }

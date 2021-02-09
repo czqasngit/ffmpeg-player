@@ -10,6 +10,7 @@ import AudioToolbox
 
 protocol FFAudioPlayerProtocol {
     func readNextAudioFrame(_ aqBuffer: AudioQueueBufferRef)
+    func updateAudioClock(pts: Double, duration: Double)
 }
 func audioQueueCallBack(inUserData: UnsafeMutableRawPointer?, audioQueue: AudioQueueRef, aqBuffer: AudioQueueBufferRef) {
     guard let inUserData = inUserData else { return }
@@ -89,11 +90,16 @@ extension FFAudioPlayer {
 
 // MARK: - 
 extension FFAudioPlayer {
-    public func receive(data: UnsafeMutablePointer<UInt8>, length: UInt32, aqBuffer: AudioQueueBufferRef) {
+    public func receive(data: UnsafeMutablePointer<UInt8>,
+                        length: UInt32,
+                        aqBuffer: AudioQueueBufferRef,
+                        pts: Double,
+                        duration: Double) {
         guard let audioQueue = self.audioQueue else { return }
         aqBuffer.pointee.mAudioDataByteSize = length
         memcpy(aqBuffer.pointee.mAudioData, data, Int(length))
         AudioQueueEnqueueBuffer(audioQueue, aqBuffer, 0, nil)
-        print("[AudioPlayer]Receive audio data: \(length)")
+        self.delegate.updateAudioClock(pts: pts, duration: duration)
+//        print("[AudioPlayer]Receive audio data: \(length)")
     }
 }
