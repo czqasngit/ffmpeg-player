@@ -92,6 +92,8 @@
 		A09F449225A553DD001E4BCA /* FFFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A09F449125A553DD001E4BCA /* FFFilter.swift */; };
 		A09F449725A560EB001E4BCA /* FFVideoRender.swift in Sources */ = {isa = PBXBuildFile; fileRef = A09F449625A560EB001E4BCA /* FFVideoRender.swift */; };
 		A09F449B25A5615B001E4BCA /* FFRGBRender.swift in Sources */ = {isa = PBXBuildFile; fileRef = A09F449A25A5615B001E4BCA /* FFRGBRender.swift */; };
+		A0A1688C25D2787B00B3A98A /* ss.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = A0A1688B25D2787A00B3A98A /* ss.mp4 */; };
+		A0A1688D25D2787B00B3A98A /* ss.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = A0A1688B25D2787A00B3A98A /* ss.mp4 */; };
 		A0CCD32625B29C2B0054C379 /* FFAudioQueuePlayer.mm in Sources */ = {isa = PBXBuildFile; fileRef = A0CCD32525B29C2B0054C379 /* FFAudioQueuePlayer.mm */; };
 		A0CCD32E25B305850054C379 /* FFObjectQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = A0CCD32D25B305850054C379 /* FFObjectQueue.m */; };
 		A0E4858A25B7D6EC00E73DF0 /* FFVideoPlayer.mm in Sources */ = {isa = PBXBuildFile; fileRef = A0E4858925B7D6EC00E73DF0 /* FFVideoPlayer.mm */; };
@@ -306,6 +308,7 @@
 		A09F449125A553DD001E4BCA /* FFFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FFFilter.swift; sourceTree = "<group>"; };
 		A09F449625A560EB001E4BCA /* FFVideoRender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FFVideoRender.swift; sourceTree = "<group>"; };
 		A09F449A25A5615B001E4BCA /* FFRGBRender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FFRGBRender.swift; sourceTree = "<group>"; };
+		A0A1688B25D2787A00B3A98A /* ss.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = ss.mp4; sourceTree = "<group>"; };
 		A0CCD32425B29C2B0054C379 /* FFAudioQueuePlayer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FFAudioQueuePlayer.h; sourceTree = "<group>"; };
 		A0CCD32525B29C2B0054C379 /* FFAudioQueuePlayer.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FFAudioQueuePlayer.mm; sourceTree = "<group>"; };
 		A0CCD32C25B305850054C379 /* FFObjectQueue.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FFObjectQueue.h; sourceTree = "<group>"; };
@@ -752,6 +755,7 @@
 				A09F437425A3074D001E4BCA /* 1280x720.mp4 */,
 				A02A93C525B6B6C300CAD2BA /* flutter.mp4 */,
 				A02A93CC25B6B78800CAD2BA /* short.mp4 */,
+				A0A1688B25D2787A00B3A98A /* ss.mp4 */,
 			);
 			path = resources;
 			sourceTree = "<group>";
@@ -900,6 +904,7 @@
 				A02A93C625B6B6C300CAD2BA /* flutter.mp4 in Resources */,
 				A09F424725A2B878001E4BCA /* Assets.xcassets in Resources */,
 				A0286A7525A8316200ACBD99 /* vertex.glsl in Resources */,
+				A0A1688C25D2787B00B3A98A /* ss.mp4 in Resources */,
 				A09F424A25A2B879001E4BCA /* Main.storyboard in Resources */,
 				A09F437A25A30758001E4BCA /* audio.mp3 in Resources */,
 			);
@@ -915,6 +920,7 @@
 				A02A93C725B6B6C300CAD2BA /* flutter.mp4 in Resources */,
 				A09F426025A2B8A6001E4BCA /* Assets.xcassets in Resources */,
 				A0286A7925A831E900ACBD99 /* vertex.glsl in Resources */,
+				A0A1688D25D2787B00B3A98A /* ss.mp4 in Resources */,
 				A09F426325A2B8A6001E4BCA /* Main.storyboard in Resources */,
 				A09F437B25A30758001E4BCA /* audio.mp3 in Resources */,
 			);
