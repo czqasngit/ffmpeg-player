@@ -17,8 +17,12 @@ extern "C" {
 
 NS_ASSUME_NONNULL_BEGIN
 
+@protocol FFEngineDelegate<NSObject>
+- (void)readyToPlay:(float)duration;
+@end
+
 @interface FFEngine : NSObject
-- (instancetype)initWithVideoRender:(id<FFVideoRender>)videoRender;
+- (instancetype)initWithVideoRender:(id<FFVideoRender>)videoRender delegate:(id<FFEngineDelegate>)delegate;
 - (BOOL)play:(const char *)url enableHWDecode:(BOOL)enableHWDecode;
 - (void)stop;
 @end

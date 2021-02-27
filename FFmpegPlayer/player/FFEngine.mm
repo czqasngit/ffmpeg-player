@@ -41,6 +41,7 @@ typedef NS_ENUM(NSInteger, FFPlayState) {
 };
 
 @interface FFEngine()
+@property (nonatomic, weak)id<FFEngineDelegate> delegate;
 @property (nonatomic, strong)FFMediaVideoContext *mediaVideoContext;
 @property (nonatomic, strong)FFMediaAudioContext *mediaAudioContext;
 @property (nonatomic, strong)FFAudioQueuePlayer *audioPlayer;
@@ -78,7 +79,7 @@ typedef NS_ENUM(NSInteger, FFPlayState) {
     [self stopVideoPlay];
     [self stopAudioPlay];
 }
-- (instancetype)initWithVideoRender:(id<FFVideoRender>)videoRender {
+- (instancetype)initWithVideoRender:(id<FFVideoRender>)videoRender delegate:(nonnull id<FFEngineDelegate>)delegate {
     self = [super init];
     if (self) {
         self->decode_dispatch_queue = dispatch_queue_create("decode queue", DISPATCH_QUEUE_SERIAL);
@@ -95,6 +96,7 @@ typedef NS_ENUM(NSInteger, FFPlayState) {
         self.videoFrameCacheQueue = [[FFObjectQueue alloc] init];
         self.audioFrameCacheQueue = [[FFObjectQueue alloc] init];
         self.videoRender = videoRender;
+        self.delegate = delegate;
     }
     return self;
 }
@@ -178,6 +180,9 @@ fail:
                     self.playState = FFPlayStatePlaying;
                     [self startAudioPlay];
                     [self startVideoPlay];
+                    if([self.delegate respondsToSelector:@selector(readyToPlay:)]) {
+                        [self.delegate readyToPlay:[self.mediaVideoContext duration]];
+                    }
                 }
                 _SleepThread(self.decodeCondition);
                 NSLog(@"Decode resume");

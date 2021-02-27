@@ -165,4 +165,7 @@ fail:
     float d = 1.0f / av_q2d(stream->avg_frame_rate);
     return d;
 }
+- (float)duration {
+    return (stream->duration * av_q2d(stream->time_base));
+}
 @end

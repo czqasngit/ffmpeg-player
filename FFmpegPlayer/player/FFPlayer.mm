@@ -12,7 +12,8 @@
 #import "FFOpenGLRender.h"
 #import "FFMetalRender.h"
 
-@interface FFPlayer()
+
+@interface FFPlayer()<FFEngineDelegate>
 @property (nonatomic, strong)FFEngine *engine;
 @property (nonatomic, strong)id<FFVideoRender> videoRender;
 @end
@@ -22,7 +23,7 @@
     self = [super init];
     if (self) {
         _videoRender = [[FFMetalRender alloc] init];
-        _engine = [[FFEngine alloc] initWithVideoRender:self.videoRender];
+        _engine = [[FFEngine alloc] initWithVideoRender:self.videoRender delegate:self];
     }
     return self;
 }
@@ -49,5 +50,12 @@
 }
 - (NSView *)renderView {
     return (id)self.videoRender;
+}
+
+#pragma mark - FFEngineDelegate
+- (void)readyToPlay:(float)duration {
+    if([self.additional respondsToSelector:@selector(receiveDuration:)]) {
+        [self.additional receiveDuration:duration];
+    }
 }
 @end
