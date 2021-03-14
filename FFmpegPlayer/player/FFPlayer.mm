@@ -45,6 +45,12 @@
     }
     return YES;
 }
+- (void)pause {
+    [_engine pause];
+}
+- (void)resume {
+    
+}
 - (void)stop {
     [_engine stop];
 }
@@ -54,8 +60,18 @@
 
 #pragma mark - FFEngineDelegate
 - (void)readyToPlay:(float)duration {
-    if([self.additional respondsToSelector:@selector(receiveDuration:)]) {
-        [self.additional receiveDuration:duration];
+    if([self.additional respondsToSelector:@selector(playerReadyToPlay:)]) {
+        [self.additional playerReadyToPlay:duration];
+    }
+}
+- (void)playCurrentTime:(float)currentTime {
+    if([self.additional respondsToSelector:@selector(playerCurrentTime:)]) {
+        [self.additional playerCurrentTime:currentTime];
+    }
+}
+- (void)playStateChanged:(FFPlayState)state {
+    if([self.additional respondsToSelector:@selector(playerStateChanged:)]) {
+        [self.additional playerStateChanged:state];
     }
 }
 @end

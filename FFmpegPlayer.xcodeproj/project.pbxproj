@@ -122,6 +122,7 @@
 		A05BAA3225B06C0400AEC9A4 /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = System/Library/Frameworks/Metal.framework; sourceTree = SDKROOT; };
 		A05BAA3C25B06D9700AEC9A4 /* Shaders.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; path = Shaders.metal; sourceTree = "<group>"; };
 		A0648D8C25D7EA3400D73349 /* long.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = long.mp4; sourceTree = "<group>"; };
+		A077972125EBB512007A4A27 /* FFPlayState.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FFPlayState.h; sourceTree = "<group>"; };
 		A09CF27325B9524600732211 /* FFCacheQueue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FFCacheQueue.swift; sourceTree = "<group>"; };
 		A09CF27725B953B600732211 /* FFAudioCacheObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FFAudioCacheObject.swift; sourceTree = "<group>"; };
 		A09CF27B25B953BF00732211 /* FFVideoCacheObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FFVideoCacheObject.swift; sourceTree = "<group>"; };
@@ -313,7 +314,7 @@
 		A09F449625A560EB001E4BCA /* FFVideoRender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FFVideoRender.swift; sourceTree = "<group>"; };
 		A09F449A25A5615B001E4BCA /* FFRGBRender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FFRGBRender.swift; sourceTree = "<group>"; };
 		A0A1688B25D2787A00B3A98A /* ss.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = ss.mp4; sourceTree = "<group>"; };
-		A0A1689125D288A700B3A98A /* FFAdditionalProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FFAdditionalProtocol.h; sourceTree = "<group>"; };
+		A0A1689125D288A700B3A98A /* FFPlayerDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FFPlayerDelegate.h; sourceTree = "<group>"; };
 		A0A1689625D289D000B3A98A /* AdditionalView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AdditionalView.h; sourceTree = "<group>"; };
 		A0A1689725D289D000B3A98A /* AdditionalView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AdditionalView.m; sourceTree = "<group>"; };
 		A0CCD32425B29C2B0054C379 /* FFAudioQueuePlayer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FFAudioQueuePlayer.h; sourceTree = "<group>"; };
@@ -705,7 +706,7 @@
 		A09F432C25A2F9E3001E4BCA /* player */ = {
 			isa = PBXGroup;
 			children = (
-				A0A1689025D2888600B3A98A /* Additional */,
+				A0A1689025D2888600B3A98A /* Delegate */,
 				A0CCD32B25B3055D0054C379 /* Utils */,
 				A0CCD32325B29C0E0054C379 /* Audio */,
 				A09F446E25A46203001E4BCA /* Video */,
@@ -719,6 +720,7 @@
 				A09F438825A30B7C001E4BCA /* FFMediaAudioContext.mm */,
 				A09F447A25A4660B001E4BCA /* FFFilter.h */,
 				A09F447B25A4660B001E4BCA /* FFFilter.mm */,
+				A077972125EBB512007A4A27 /* FFPlayState.h */,
 			);
 			path = player;
 			sourceTree = "<group>";
@@ -807,12 +809,12 @@
 			path = video;
 			sourceTree = "<group>";
 		};
-		A0A1689025D2888600B3A98A /* Additional */ = {
+		A0A1689025D2888600B3A98A /* Delegate */ = {
 			isa = PBXGroup;
 			children = (
-				A0A1689125D288A700B3A98A /* FFAdditionalProtocol.h */,
+				A0A1689125D288A700B3A98A /* FFPlayerDelegate.h */,
 			);
-			path = Additional;
+			path = Delegate;
 			sourceTree = "<group>";
 		};
 		A0CCD32325B29C0E0054C379 /* Audio */ = {

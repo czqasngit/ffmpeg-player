@@ -14,16 +14,24 @@ extern "C" {
 #import "FFVideoRender.h"
 #import "FFAudioQueuePlayer.h"
 #import "FFVideoPlayer.h"
+#import "FFPlayState.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
+
+
+
 @protocol FFEngineDelegate<NSObject>
 - (void)readyToPlay:(float)duration;
+- (void)playCurrentTime:(float)currentTime;
+- (void)playStateChanged:(FFPlayState)state;
 @end
 
 @interface FFEngine : NSObject
 - (instancetype)initWithVideoRender:(id<FFVideoRender>)videoRender delegate:(id<FFEngineDelegate>)delegate;
 - (BOOL)play:(const char *)url enableHWDecode:(BOOL)enableHWDecode;
+- (void)pause;
+- (void)resume;
 - (void)stop;
 @end
 

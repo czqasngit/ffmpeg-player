@@ -12,6 +12,7 @@
 #import "FFQueueAudioObject.h"
 #import "FFQueueVideoObject.h"
 #import <pthread.h>
+#import "FFPlayState.h"
 
 #define MAX_AUDIO_FRAME_DURATION   2
 #define MIN_AUDIO_FRAME_DURATION   1
@@ -32,13 +33,6 @@ NS_INLINE void _SleepThread(NSCondition *condition) {
     [condition wait];
 }
 
-typedef NS_ENUM(NSInteger, FFPlayState) {
-    FFPlayStateNone,
-    FFPlayStateLoading,
-    FFPlayStatePlaying,
-    FFPlayStatePause,
-    FFPlayStateStop
-};
 
 @interface FFEngine()
 @property (nonatomic, weak)id<FFEngineDelegate> delegate;
@@ -159,9 +153,24 @@ fail:
     self->video_clock = 0;
     
 }
+- (void)pause {
+    _SleepThread(_audioPlayCondition);
+}
+- (void)resume {
+    
+}
 - (void)stop {
     [self stopVideoPlay];
     [self stopAudioPlay];
+}
+
+#pragma mark -
+- (void)setPlayState:(FFPlayState)playState {
+    if(_playState == playState) return;
+    _playState = playState;
+    if([self.delegate respondsToSelector:@selector(playStateChanged:)]) {
+        [self.delegate playStateChanged:playState];
+    }
 }
 @end
 
@@ -365,6 +374,9 @@ fail:
 - (void)updateAudioClock:(float)pts duration:(float)duration {
     pthread_mutex_lock(&mutex);
     self->audio_clock = pts + duration;
+    if([self.delegate respondsToSelector:@selector(playCurrentTime:)]) {
+        [self.delegate playCurrentTime:self->audio_clock];
+    }
     pthread_mutex_unlock(&mutex);
 }
 @end
