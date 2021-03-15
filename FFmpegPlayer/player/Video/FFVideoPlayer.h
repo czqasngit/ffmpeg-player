@@ -29,6 +29,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)renderFrame:(AVFrame *)frame;
 - (void)startPlay;
 - (void)stopPlay;
+- (void)pause;
+- (void)resume;
 - (AVPixelFormat)pixelFormat;
 @end
 

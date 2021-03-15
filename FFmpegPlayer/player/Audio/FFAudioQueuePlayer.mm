@@ -114,5 +114,10 @@ static void _AudioQueueOutputCallback(void *inUserData, AudioQueueRef inAQ, Audi
 - (void)stop {
     AudioQueueStop(audioQueue, YES);
 }
-
+- (void)pause {
+    AudioQueuePause(audioQueue);
+}
+- (void)resume {
+    AudioQueueStart(audioQueue, NULL);
+}
 @end

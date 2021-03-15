@@ -35,7 +35,11 @@
     
 }
 - (void)playAndPause {
-    [self.player pause];
+    if(self.player.playState == FFPlayStatePlaying) {
+        [self.player pause];
+    } else {
+        [self.player resume];
+    }
 }
 
 @end

@@ -49,10 +49,13 @@
     [_engine pause];
 }
 - (void)resume {
-    
+    [_engine resume];
 }
 - (void)stop {
     [_engine stop];
+}
+- (FFPlayState)playState {
+    return [_engine playState];
 }
 - (NSView *)renderView {
     return (id)self.videoRender;

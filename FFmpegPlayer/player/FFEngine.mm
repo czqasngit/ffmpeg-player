@@ -154,16 +154,19 @@ fail:
     
 }
 - (void)pause {
-    _SleepThread(_audioPlayCondition);
+    [self.audioPlayer pause];
+    [self.videoPlayer pause];
+    self.playState = FFPlayStatePause;
 }
 - (void)resume {
-    
+    [self.audioPlayer resume];
+    [self.videoPlayer resume];
+    self.playState = FFPlayStatePlaying;
 }
 - (void)stop {
     [self stopVideoPlay];
     [self stopAudioPlay];
 }
-
 #pragma mark -
 - (void)setPlayState:(FFPlayState)playState {
     if(_playState == playState) return;

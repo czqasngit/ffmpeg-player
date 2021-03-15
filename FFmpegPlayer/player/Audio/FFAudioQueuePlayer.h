@@ -25,6 +25,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)reuseAudioQueueBuffer:(AudioQueueBufferRef)aqBuffer;
 - (void)play;
 - (void)stop;
+- (void)pause;
+- (void)resume;
 @end
 
 NS_ASSUME_NONNULL_END

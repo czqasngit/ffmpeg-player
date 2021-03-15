@@ -20,6 +20,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)resume;
 - (void)stop;
 - (NSView *)renderView;
+- (FFPlayState)playState;
 @end
 
 NS_ASSUME_NONNULL_END

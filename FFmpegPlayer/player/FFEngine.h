@@ -28,6 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface FFEngine : NSObject
+@property (nonatomic, assign, readonly)FFPlayState playState;
 - (instancetype)initWithVideoRender:(id<FFVideoRender>)videoRender delegate:(id<FFEngineDelegate>)delegate;
 - (BOOL)play:(const char *)url enableHWDecode:(BOOL)enableHWDecode;
 - (void)pause;
