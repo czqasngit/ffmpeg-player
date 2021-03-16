@@ -7,11 +7,24 @@
 
 #import "AdditionalView.h"
 
+@interface _NSSlider : NSSlider
+@property (nonatomic, strong)void(^mouseDownBlock)(void);
+@end
+@implementation _NSSlider
+
+- (void)mouseDown:(NSEvent *)event {
+    NSLog(@"滑动: 鼠标按下");
+    self.mouseDownBlock();
+    [super mouseDown:event];
+}
+
+@end
+
 @interface AdditionalView()
 @property (nonatomic, strong)NSView *container;
 @property (nonatomic, strong)NSTextField *durationLabel;
 @property (nonatomic, strong)NSTextField *currentTimeLabel;
-@property (nonatomic, strong)NSSlider *slider;
+@property (nonatomic, strong)_NSSlider *slider;
 @property (nonatomic, strong)NSButton *playButton;
 @property (nonatomic, strong)NSButton *nextButton;
 @property (nonatomic, strong)NSButton *prevButton;
@@ -118,12 +131,17 @@
     }
     return _currentTimeLabel;
 }
-- (NSSlider *)slider {
+- (_NSSlider *)slider {
     if(!_slider) {
-        _slider = [[NSSlider alloc] init];
+        _slider = [_NSSlider sliderWithTarget:self action:@selector(sliderAction:)];
         _slider.translatesAutoresizingMaskIntoConstraints = NO;
         _slider.wantsLayer = YES;
-//        _slider.layer.backgroundColor = [[NSColor blackColor] colorWithAlphaComponent:0.5f].CGColor;
+        _slider.continuous = NO;
+        __weak typeof(self) ws = self;
+        _slider.mouseDownBlock = ^{
+            __strong typeof(ws) ss = ws;
+            [ss.delegate pause];
+        };
     }
     return _slider;
 }
@@ -149,6 +167,8 @@
         _nextButton.wantsLayer = YES;
         _nextButton.bezelStyle = NSBezelStyleTexturedSquare;
         [_nextButton setImage:[NSImage imageNamed:@"next"]];
+        [_nextButton setTarget:self];
+        [_nextButton setAction:@selector(speed:)];
     }
     return _nextButton;
 }
@@ -160,21 +180,26 @@
         _prevButton.wantsLayer = YES;
         _prevButton.bezelStyle = NSBezelStyleTexturedSquare;
         [_prevButton setImage:[NSImage imageNamed:@"prev"]];
+        [_prevButton setTarget:self];
+        [_prevButton setAction:@selector(fastBackward:)];
     }
     return _prevButton;
 }
 
 #pragma mark - Action
 - (void)play:(NSButton *)sender {
-    [self.delegate playAndPause];
+    [self.delegate togglePlayAction];
 }
 - (void)fastBackward:(id)sender {
-    
+    [self.delegate seekTo:self.currentTime - 3];
 }
 - (void)speed:(id)sender {
-    
+    [self.delegate seekTo:self.currentTime + 3];
 }
-
+- (void)sliderAction:(NSSlider *)sender {
+    NSLog(@"滑动: %f", sender.floatValue);
+    [self.delegate seekTo:sender.floatValue];
+}
 #pragma mark - FFPlayerDelegate
 - (void)playerReadyToPlay:(float)duration {
     self.duration = duration;

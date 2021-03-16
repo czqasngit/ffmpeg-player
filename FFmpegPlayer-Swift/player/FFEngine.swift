@@ -117,7 +117,7 @@ extension FFEngine {
         self.audioClock = 0
     }
     func stop() {
-        self.videoPlayer?.stopPlay()
+        self.videoPlayer?.stop()
         self.audioPlayer?.stop()
     }
 }
@@ -158,7 +158,7 @@ extension FFEngine {
                     if self.playState == .loading {
                         self.playState = .playing
                         self.audioPlayer?.play()
-                        self.videoPlayer?.startPlay()
+                        self.videoPlayer?.start()
                     }
                     _Sleep(cond: self.decodeCondition)
                 }
@@ -260,7 +260,7 @@ extension FFEngine : FFVideoPlayerProtocol {
             } else {
                 if _decodecComplete {
                     print("Video frame render completed.")
-                    self.videoPlayer?.stopPlay()
+                    self.videoPlayer?.stop()
                 }
             }
         }

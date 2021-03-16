@@ -54,6 +54,9 @@
 - (void)stop {
     [_engine stop];
 }
+- (void)seekTo:(float)time {
+    [self.engine seekTo:time];
+}
 - (FFPlayState)playState {
     return [_engine playState];
 }
@@ -63,18 +66,18 @@
 
 #pragma mark - FFEngineDelegate
 - (void)readyToPlay:(float)duration {
-    if([self.additional respondsToSelector:@selector(playerReadyToPlay:)]) {
-        [self.additional playerReadyToPlay:duration];
+    if([self.ffPlayerDelegate respondsToSelector:@selector(playerReadyToPlay:)]) {
+        [self.ffPlayerDelegate playerReadyToPlay:duration];
     }
 }
 - (void)playCurrentTime:(float)currentTime {
-    if([self.additional respondsToSelector:@selector(playerCurrentTime:)]) {
-        [self.additional playerCurrentTime:currentTime];
+    if([self.ffPlayerDelegate respondsToSelector:@selector(playerCurrentTime:)]) {
+        [self.ffPlayerDelegate playerCurrentTime:currentTime];
     }
 }
 - (void)playStateChanged:(FFPlayState)state {
-    if([self.additional respondsToSelector:@selector(playerStateChanged:)]) {
-        [self.additional playerStateChanged:state];
+    if([self.ffPlayerDelegate respondsToSelector:@selector(playerStateChanged:)]) {
+        [self.ffPlayerDelegate playerStateChanged:state];
     }
 }
 @end

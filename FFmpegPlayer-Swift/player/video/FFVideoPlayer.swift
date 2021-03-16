@@ -54,7 +54,7 @@ extension FFVideoPlayer {
     private func timerHandler() {
         self.delegate.readNextVideoFrame()
     }
-    public func startPlay() {
+    public func start() {
         if let timer = self.timer {
             timer.cancel()
         }
@@ -65,7 +65,7 @@ extension FFVideoPlayer {
         self.timer?.resume()
     }
     
-    public func stopPlay() {
+    public func stop() {
         if let timer = self.timer {
             timer.cancel()
         }

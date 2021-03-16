@@ -10,9 +10,9 @@
 
 NS_ASSUME_NONNULL_BEGIN
 @protocol AdditionalViewDelegate <NSObject>
-- (void)fastBackward:(float)duration;
-- (void)speed:(float)duration;
-- (void)playAndPause;
+- (void)seekTo:(float)duration;
+- (void)togglePlayAction;
+- (void)pause;
 @end
 @interface AdditionalView : NSView<FFPlayerDelegate>
 @property (nonatomic, weak)id<AdditionalViewDelegate> delegate;

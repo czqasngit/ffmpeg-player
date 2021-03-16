@@ -27,8 +27,8 @@ NS_ASSUME_NONNULL_BEGIN
                        stream:(AVStream *)stream
                      delegate:(id<FFVideoPlayerDelegate>)delegate;
 - (void)renderFrame:(AVFrame *)frame;
-- (void)startPlay;
-- (void)stopPlay;
+- (void)start;
+- (void)stop;
 - (void)pause;
 - (void)resume;
 - (AVPixelFormat)pixelFormat;

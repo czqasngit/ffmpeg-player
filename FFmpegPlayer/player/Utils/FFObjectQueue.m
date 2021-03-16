@@ -49,4 +49,9 @@
     pthread_mutex_unlock(&locker);
     return count;
 }
+- (void)clean {
+    pthread_mutex_lock(&locker);
+    [_storage removeAllObjects];
+    pthread_mutex_unlock(&locker);
+}
 @end

@@ -18,9 +18,6 @@ extern "C" {
 
 NS_ASSUME_NONNULL_BEGIN
 
-
-
-
 @protocol FFEngineDelegate<NSObject>
 - (void)readyToPlay:(float)duration;
 - (void)playCurrentTime:(float)currentTime;
@@ -34,6 +31,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)pause;
 - (void)resume;
 - (void)stop;
+- (void)seekTo:(float)time;
 @end
 
 @interface FFEngine (Control)

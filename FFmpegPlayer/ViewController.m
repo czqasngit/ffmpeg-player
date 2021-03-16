@@ -24,22 +24,21 @@
     AdditionalView *additionalView = [[AdditionalView alloc] initWithFrame:_player.renderView.frame];
     additionalView.delegate = self;
     [self.view addSubview:additionalView];
-    _player.additional = additionalView;
+    _player.ffPlayerDelegate = additionalView;
     [_player playWithUrl:url enableHWDecode:YES];
 }
 
-- (void)fastBackward:(float)duration {
-    
+- (void)seekTo:(float)duration {
+    [self.player seekTo:duration];
 }
-- (void)speed:(float)duration {
-    
-}
-- (void)playAndPause {
+- (void)togglePlayAction {
     if(self.player.playState == FFPlayStatePlaying) {
         [self.player pause];
     } else {
         [self.player resume];
     }
 }
-
+- (void)pause {
+    [self.player pause];
+}
 @end

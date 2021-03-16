@@ -22,6 +22,7 @@ static void _AudioQueueOutputCallback(void *inUserData, AudioQueueRef inAQ, Audi
     AudioQueueRef audioQueue;
     FFAudioInformation audioInformation;
     CFMutableArrayRef buffers;
+    AVStream *stream;
 }
 
 - (void)dealloc {
@@ -34,10 +35,12 @@ static void _AudioQueueOutputCallback(void *inUserData, AudioQueueRef inAQ, Audi
     
 }
 - (instancetype)initWithAudioInformation:(FFAudioInformation)audioInformation
+                                  stream:(AVStream *)stream
                                 delegate:(id<FFAudioQueuePlayerDelegate>)delegate {
     self = [super init];
     if (self) {
         self->audioInformation = audioInformation;
+        self->stream = stream;
         self.delegate = delegate;
         self->buffers = CFArrayCreateMutable(CFAllocatorGetDefault(), 0, NULL) ;
         [self initializeAudioQueue];

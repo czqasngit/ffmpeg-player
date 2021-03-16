@@ -141,6 +141,7 @@ fail:
                                                                  formatContext:formatContext];
             if(!_mediaAudioContext) return NO;
             self.audioPlayer = [[FFAudioQueuePlayer alloc] initWithAudioInformation:_mediaAudioContext.audioInformation
+                                                                             stream:stream
                                                                            delegate:(id)self];
         }
     }
@@ -166,6 +167,13 @@ fail:
 - (void)stop {
     [self stopVideoPlay];
     [self stopAudioPlay];
+}
+- (void)seekTo:(float)time {
+    [self pause];
+    [self.audioFrameCacheQueue clean];
+    [self.videoFrameCacheQueue clean];
+    av_seek_frame(self->formatContext, -1, time * AV_TIME_BASE, AVSEEK_FLAG_BACKWARD);
+    [self resume];
 }
 #pragma mark -
 - (void)setPlayState:(FFPlayState)playState {
@@ -262,12 +270,12 @@ fail:
 @implementation FFEngine (Control)
 - (void)startVideoPlay {
     if(self.mediaVideoContext) {
-        [self.videoPlayer startPlay];
+        [self.videoPlayer start];
     }
 }
 - (void)stopVideoPlay {
     if(self.mediaVideoContext) {
-        [self.videoPlayer stopPlay];
+        [self.videoPlayer stop];
     }
 }
 #pragma mark - Audio
@@ -335,7 +343,7 @@ fail:
         } else {
             if(isDecodeComplete) {
                 NSLog(@"Video frame render completed.");
-                [self.videoPlayer stopPlay];
+                [self.videoPlayer stop];
             }
         }
     });

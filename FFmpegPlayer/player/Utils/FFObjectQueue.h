@@ -13,6 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (id _Nullable)dequeue;
 - (void)enqueue:(id)object;
 - (NSInteger)count;
+- (void)clean;
 @end
 
 NS_ASSUME_NONNULL_END

@@ -58,17 +58,17 @@
     self->video_render_timer = NULL;
 }
 #pragma mark - Public
-- (void)startPlay {
+- (void)start {
     [self startVideoRender];
 }
-- (void)stopPlay {
+- (void)stop {
     [self stopVideoRender];
 }
 - (void)pause {
-    [self stopPlay];
+    [self stop];
 }
 - (void)resume {
-    [self startPlay];
+    [self start];
 }
 - (void)renderFrame:(AVFrame *)frame {
     float unit = av_q2d(self->stream->time_base);
