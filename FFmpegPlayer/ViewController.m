@@ -17,7 +17,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     _player = [[FFPlayer alloc] init];
-    NSString *url = [[NSBundle mainBundle] pathForResource:@"flutter" ofType:@"mp4"];
+    NSString *url = [[NSBundle mainBundle] pathForResource:@"ss" ofType:@"mp4"];
 //    NSString *url = [[NSBundle mainBundle] pathForResource:@"audio" ofType:@"mp3"];
     [self.view addSubview:_player.renderView];
     _player.renderView.frame = CGRectMake(0, 0, 1280, 720);

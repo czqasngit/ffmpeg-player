@@ -119,8 +119,13 @@ static void _AudioQueueOutputCallback(void *inUserData, AudioQueueRef inAQ, Audi
 }
 - (void)pause {
     AudioQueuePause(audioQueue);
+    NSLog(@"[音频]暂停");
 }
 - (void)resume {
     AudioQueueStart(audioQueue, NULL);
+    NSLog(@"[音频]恢复");
+}
+- (void)cleanQueueCacheData {
+    AudioQueueFlush(audioQueue);
 }
 @end

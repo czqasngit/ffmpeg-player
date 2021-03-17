@@ -172,7 +172,11 @@ fail:
     [self pause];
     [self.audioFrameCacheQueue clean];
     [self.videoFrameCacheQueue clean];
+    avcodec_flush_buffers([_mediaVideoContext codecContext]);
+    avcodec_flush_buffers([_mediaAudioContext codecContext]);
+    [self.audioPlayer cleanQueueCacheData];
     av_seek_frame(self->formatContext, -1, time * AV_TIME_BASE, AVSEEK_FLAG_BACKWARD);
+    _NotifyWaitThreadWakeUp(self.decodeCondition);
     [self resume];
 }
 #pragma mark -
@@ -219,6 +223,9 @@ fail:
                     BOOL ret = [self.mediaVideoContext decodePacket:self->packet frame:&frame];
                     obj.pts = obj.frame->pts * unit;
                     obj.duration = [self.mediaVideoContext oneFrameDuration];
+                    if(self.videoFrameCacheQueue.count < 3) {
+                        NSLog(@"[SEEK]当前的视频帧缓存数量:%ld, PTS:%f", self.videoFrameCacheQueue.count, obj.pts);
+                    }
                     NSLog(@"【PTS】【Video】: %f, duration: %lld, last: %lld, repeat: %d", frame->pts * unit, duration, self->packet->duration, frame->repeat_pict);
                     if(ret) {
                         [self.videoFrameCacheQueue enqueue:obj];
@@ -316,7 +323,7 @@ fail:
         NSLog(@"[Sync]音频太快,视频追赶跳过: %d 帧", (readCount - 1));
     } else if (vc - ac > self->tolerance_scope) {
         float sleep_time = vc - ac;
-        NSLog(@"[Sync]视频太快,视频等待:%f", sleep_time);
+        NSLog(@"[Sync]视频太快,视频等待:%f, vc: %f, ac: %f", sleep_time, vc, ac);
         usleep(sleep_time * 1000 * 1000);
     } else {
         NSLog(@"[Sync]音频在误差允许范围内: %f, %f", abs(ac - vc), self->tolerance_scope);
