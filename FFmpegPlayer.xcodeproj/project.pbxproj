@@ -714,12 +714,6 @@
 				A09F432E25A2FA08001E4BCA /* FFPlayer.mm */,
 				A09F436C25A3045A001E4BCA /* FFEngine.h */,
 				A09F436D25A3045A001E4BCA /* FFEngine.mm */,
-				A09F438225A30B70001E4BCA /* FFMediaVideoContext.h */,
-				A09F438325A30B70001E4BCA /* FFMediaVideoContext.mm */,
-				A09F438725A30B7C001E4BCA /* FFMediaAudioContext.h */,
-				A09F438825A30B7C001E4BCA /* FFMediaAudioContext.mm */,
-				A09F447A25A4660B001E4BCA /* FFFilter.h */,
-				A09F447B25A4660B001E4BCA /* FFFilter.mm */,
 				A077972125EBB512007A4A27 /* FFPlayState.h */,
 			);
 			path = player;
@@ -784,6 +778,8 @@
 		A09F446E25A46203001E4BCA /* Video */ = {
 			isa = PBXGroup;
 			children = (
+				A09F438225A30B70001E4BCA /* FFMediaVideoContext.h */,
+				A09F438325A30B70001E4BCA /* FFMediaVideoContext.mm */,
 				A05BAA2825B06B7400AEC9A4 /* FFMetalRender.h */,
 				A05BAA2725B06B7400AEC9A4 /* FFMetalRender.mm */,
 				A0286A6625A830B100ACBD99 /* FFOpenGLRender.h */,
@@ -793,6 +789,8 @@
 				A0E4858825B7D6EC00E73DF0 /* FFVideoPlayer.h */,
 				A0E4858925B7D6EC00E73DF0 /* FFVideoPlayer.mm */,
 				A09F447525A4651D001E4BCA /* FFVideoRender.h */,
+				A09F447A25A4660B001E4BCA /* FFFilter.h */,
+				A09F447B25A4660B001E4BCA /* FFFilter.mm */,
 			);
 			path = Video;
 			sourceTree = "<group>";
@@ -820,6 +818,8 @@
 		A0CCD32325B29C0E0054C379 /* Audio */ = {
 			isa = PBXGroup;
 			children = (
+				A09F438725A30B7C001E4BCA /* FFMediaAudioContext.h */,
+				A09F438825A30B7C001E4BCA /* FFMediaAudioContext.mm */,
 				A0CCD32425B29C2B0054C379 /* FFAudioQueuePlayer.h */,
 				A0CCD32525B29C2B0054C379 /* FFAudioQueuePlayer.mm */,
 				A02A93BB25B66C4700CAD2BA /* FFAudioInformation.h */,
