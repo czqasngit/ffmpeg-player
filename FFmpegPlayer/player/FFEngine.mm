@@ -172,11 +172,13 @@ fail:
     [self pause];
     [self.audioFrameCacheQueue clean];
     [self.videoFrameCacheQueue clean];
+    pthread_mutex_lock(&(self->mutex));
     avcodec_flush_buffers([_mediaVideoContext codecContext]);
     avcodec_flush_buffers([_mediaAudioContext codecContext]);
     [self.audioPlayer cleanQueueCacheData];
     av_seek_frame(self->formatContext, -1, time * AV_TIME_BASE, AVSEEK_FLAG_BACKWARD);
     _NotifyWaitThreadWakeUp(self.decodeCondition);
+    pthread_mutex_unlock(&(self->mutex));
     [self resume];
 }
 #pragma mark -
@@ -212,7 +214,9 @@ fail:
                 NSLog(@"Decode resume");
             }
             av_packet_unref(self->packet);
+            pthread_mutex_lock(&(self->mutex));
             int ret_code = av_read_frame(self->formatContext, self->packet);
+            pthread_mutex_unlock(&(self->mutex));
             if(ret_code >= 0) {
                 if(self.mediaVideoContext && self->packet->stream_index == self.mediaVideoContext.streamIndex) {
                     uint64_t duration = self->formatContext->streams[self.mediaVideoContext.streamIndex]->duration;
@@ -220,7 +224,9 @@ fail:
                     float unit = av_q2d(self->formatContext->streams[self.mediaVideoContext.streamIndex]->time_base);
                     obj.unit = unit;
                     AVFrame *frame = obj.frame;
+                    pthread_mutex_lock(&(self->mutex));
                     BOOL ret = [self.mediaVideoContext decodePacket:self->packet frame:&frame];
+                    pthread_mutex_unlock(&(self->mutex));
                     obj.pts = obj.frame->pts * unit;
                     obj.duration = [self.mediaVideoContext oneFrameDuration];
                     if(self.videoFrameCacheQueue.count < 3) {
