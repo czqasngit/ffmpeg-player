@@ -70,4 +70,10 @@ extension FFVideoPlayer {
             timer.cancel()
         }
     }
+    func pause() {
+        self.stop()
+    }
+    func resume() {
+        self.start()
+    }
 }

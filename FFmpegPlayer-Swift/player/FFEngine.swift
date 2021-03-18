@@ -29,6 +29,11 @@ enum FFPlayState {
     case pause
     case stop
 }
+protocol FFEngineProtocol {
+    func playerReadyToPlay(_ duration: Float)
+    func playerCurrentTime(_ currentTime: Float)
+    func playerStateChanged(_ state: FFPlayState)
+}
 class FFEngine {
     private let render: FFVideoRender
     private var videoPlayer: FFVideoPlayer?
@@ -49,9 +54,13 @@ class FFEngine {
     private var videoClock: Double = 0
     private var audioClock: Double = 0
     private var toleranceScope: Double = 0
-    private var playState = FFPlayState.none
+    var playState = FFPlayState.none {
+        didSet {
+            self.ffEngineDelegate?.playerStateChanged(self.playState)
+        }
+    }
     private var packet = av_packet_alloc()
-    
+    var ffEngineDelegate: FFEngineProtocol? = nil
     deinit {
         av_packet_unref(packet)
         av_packet_free(&packet)
@@ -120,6 +129,29 @@ extension FFEngine {
         self.videoPlayer?.stop()
         self.audioPlayer?.stop()
     }
+    func pause() {
+        self.videoPlayer?.pause()
+        self.audioPlayer?.pause()
+        self.playState = .pause
+    }
+    func resume() {
+        self.videoPlayer?.resume()
+        self.audioPlayer?.resume()
+        self.playState = .playing
+    }
+    func seekTo(_ time: Float) {
+        self.pause()
+        self.audioCacheQueue.clean()
+        self.videoCacheQueue.clean()
+        pthread_mutex_lock(&(self.mutex))
+        avcodec_flush_buffers(self.videoContext?.getContext())
+        avcodec_flush_buffers(self.audioContext?.getContext())
+        self.audioPlayer?.cleanCacheData()
+        av_seek_frame(self.formatContext, -1, Int64(time * Float(AV_TIME_BASE)), AVSEEK_FLAG_BACKWARD)
+        _Wakeup(cond: self.decodeCondition)
+        pthread_mutex_unlock(&(self.mutex))
+        self.resume()
+    }
 }
 //MARK: - Utility
 extension FFEngine {
@@ -159,25 +191,31 @@ extension FFEngine {
                         self.playState = .playing
                         self.audioPlayer?.play()
                         self.videoPlayer?.start()
+                        self.ffEngineDelegate?.playerReadyToPlay(self.videoContext?.getDuration() ?? 0)
                     }
                     _Sleep(cond: self.decodeCondition)
                 }
                 av_packet_unref(self.packet)
+                pthread_mutex_lock(&(self.mutex))
                 let ret = av_read_frame(self.formatContext, self.packet)
+                pthread_mutex_unlock(&(self.mutex))
                 if ret == 0 {
                     if let videoContext = self.videoContext,
                        self.packet!.pointee.stream_index == videoContext.streamIndex {
                         let unit = av_q2d(videoContext.getStream().pointee.time_base)
                         let obj = FFVideoCacheObject.init(pts: 0, duration: videoContext.oneFrameDuration())
                         var frame = obj.getFrame()
-                        if let videoContext = self.videoContext,
-                            videoContext.decode(packet: self.packet!, outputFrame: &frame) {
+                        pthread_mutex_lock(&(self.mutex))
+                        let ret = self.videoContext?.decode(packet: self.packet!, outputFrame: &frame) ?? false
+                        pthread_mutex_unlock(&(self.mutex))
+                        if ret {
                             obj.setPTS(unit * Double(frame.pointee.pts))
                             self.videoCacheQueue.enqueue(obj)
                             if self.videoCanKeepMoving() {
                                 _Wakeup(cond: self.videoCondition)
                             }
                         }
+                        
                     } else if let audioContext = self.audioContext,
                               self.packet!.pointee.stream_index == audioContext.streamIndex {
                         if let avctx = self.audioContext {
@@ -189,7 +227,10 @@ extension FFEngine {
                                                               duration: duration )
                             var outBufferSize: UInt32 = 0
                             var outBuffer: UnsafeMutablePointer<UInt8>! = obj.getCacheData()
-                            if avctx.decode(packet: self.packet!, outBuffer: &outBuffer, outBufferSize: &outBufferSize) {
+                            pthread_mutex_lock(&(self.mutex))
+                            let ret = avctx.decode(packet: self.packet!, outBuffer: &outBuffer, outBufferSize: &outBufferSize)
+                            pthread_mutex_unlock(&(self.mutex))
+                            if ret {
                                 obj.setCacheLength(outBufferSize)
                                 self.audioCacheQueue.enqueue(obj)
                                 if self.audioCanKeepMoving() {
@@ -305,6 +346,7 @@ extension FFEngine : FFAudioPlayerProtocol {
     func updateAudioClock(pts: Double, duration: Double) {
         pthread_mutex_lock(&(self.mutex));
         self.audioClock = pts + duration;
+        self.ffEngineDelegate?.playerCurrentTime(Float(self.audioClock))
         pthread_mutex_unlock(&(self.mutex));
     }
 }

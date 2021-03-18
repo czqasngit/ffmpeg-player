@@ -97,6 +97,10 @@ extension FFMediaVideoContext {
     public var fps: Double { av_q2d(self.stream.pointee.avg_frame_rate) }
     public func oneFrameDuration() -> Double { 1.0 / av_q2d(stream.pointee.avg_frame_rate) }
     public func getStream() -> UnsafeMutablePointer<AVStream> { self.stream }
+    public func getDuration() -> Float {
+        return Float(self.stream.pointee.duration) * Float(av_q2d(stream.pointee.time_base))
+    }
+    public func getContext() -> UnsafeMutablePointer<AVCodecContext> { self.codecContext }
     public func decode(packet: UnsafeMutablePointer<AVPacket>,
                        outputFrame: UnsafeMutablePointer<UnsafeMutablePointer<AVFrame>>) -> Bool {
         var ret = avcodec_send_packet(codecContext, packet)

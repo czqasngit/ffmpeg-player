@@ -250,7 +250,9 @@ fail:
                     FFQueueAudioObject *obj = [[FFQueueAudioObject alloc] initWithLength:buffer_size pts:self->packet->pts * unit duration:self->packet->duration * unit];
                     uint8_t *buffer = obj.data;
                     int64_t bufferSize = 0;
+                    pthread_mutex_lock(&(self->mutex));
                     BOOL ret = [self.mediaAudioContext decodePacket:self->packet outBuffer:&buffer outBufferSize:&bufferSize];
+                    pthread_mutex_unlock(&(self->mutex));
                     if(ret) {
                         [obj updateLength:bufferSize];
                         [self.audioFrameCacheQueue enqueue:obj];

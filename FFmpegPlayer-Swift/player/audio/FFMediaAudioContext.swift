@@ -109,4 +109,5 @@ extension FFMediaAudioContext {
         av_frame_unref(frame)
         return true
     }
+    public func getContext() -> UnsafeMutablePointer<AVCodecContext> { return self.codecContext }
 }

@@ -33,4 +33,12 @@ extension FFCacheQueue {
         }
         return self.storage.popLast()
     }
+    public func clean() {
+        pthread_mutex_lock(&mutex)
+        defer {
+            pthread_mutex_unlock(&mutex)
+        }
+        self.storage.removeAll()
+    }
+    
 }

@@ -86,6 +86,18 @@ extension FFAudioPlayer {
         guard let audioQueue = self.audioQueue else { return }
         AudioQueueStop(audioQueue, true)
     }
+    public func pause() {
+        guard let audioQueue = self.audioQueue else { return }
+        AudioQueuePause(audioQueue)
+    }
+    public func resume() {
+        guard let audioQueue = self.audioQueue else { return }
+        AudioQueueStart(audioQueue, nil)
+    }
+    public func cleanCacheData() {
+        guard let audioQueue = self.audioQueue else { return }
+        AudioQueueFlush(audioQueue)
+    }
 }
 
 // MARK: - 
