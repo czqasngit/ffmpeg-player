@@ -55,6 +55,7 @@
     ret = avcodec_open2(self->codecContext, self->codec, NULL);
     if(ret < 0) goto fail;
     NSLog(@"=================== Audio Information ===================");
+    NSLog(@"AV_CODEC_CAP_VARIABLE_FRAME_SIZE: %d", (self->codec->capabilities & AV_CODEC_CAP_VARIABLE_FRAME_SIZE) ? 1 : 0);
     NSLog(@"Sample Rate: %d", codecContext->sample_rate);
     NSLog(@"FMT: %d, %s", codecContext->sample_fmt, av_get_sample_fmt_name(codecContext->sample_fmt));
     NSLog(@"Channels: %d", codecContext->channels);
@@ -92,28 +93,41 @@ fail:
     return self->codecContext;
 }
 
-- (BOOL)decodePacket:(AVPacket *)packet outBuffer:(uint8_t **)buffer outBufferSize:(int64_t *)outBufferSize {
+- (NSArray<FFQueueAudioObject *> *)decodePacket:(AVPacket *)packet {
+    NSMutableArray *tmps = [[NSMutableArray alloc] init];
     int ret = avcodec_send_packet(self->codecContext, packet);
-    if(ret != 0) return NO;
+    if(ret != 0) return @[];
     av_frame_unref(frame);
-    ret = avcodec_receive_frame(self->codecContext, frame);
-    if(ret != 0) {
-        av_frame_unref(frame);
-        return NO;
+    while (true) {
+        ret = avcodec_receive_frame(self->codecContext, frame);
+        if(ret != 0) {
+            av_frame_unref(frame);
+            break;
+        }
+        int buffer_size = self.audioInformation.buffer_size;
+        float unit = av_q2d(self.codecContext->time_base);
+        FFQueueAudioObject *obj = [[FFQueueAudioObject alloc] initWithLength:buffer_size pts:packet->pts * unit duration:packet->duration * unit];
+        uint8_t *buffer = obj.data;
+        int ret = swr_convert(au_convert_ctx, &buffer, frame->nb_samples, (const uint8_t **)frame->data, frame->nb_samples);
+        [obj updateLength:ret * self.audioInformation.bytesPerSample];
+        [tmps addObject:obj];
     }
-    ret = swr_convert(au_convert_ctx, buffer, frame->nb_samples, (const uint8_t **)frame->data, frame->nb_samples);
-    *outBufferSize = ret * self.audioInformation.bytesPerSample;
     av_frame_unref(frame);
-    return YES;
+    return tmps;
 }
 - (FFAudioInformation)audioInformation {
     if(_audioInformation.rate == 0) {
         _audioInformation.format = AV_SAMPLE_FMT_S16;
         _audioInformation.channels = 2;
-        _audioInformation.buffer_size = av_samples_get_buffer_size(NULL,
-                                                                   _audioInformation.channels,
-                                                                   codecContext->frame_size,
-                                                                   _audioInformation.format, 1);
+        if(codecContext->frame_size > 0) {
+            _audioInformation.buffer_size = av_samples_get_buffer_size(NULL,
+                                                                       _audioInformation.channels,
+                                                                       codecContext->frame_size,
+                                                                       _audioInformation.format, 1);
+        } else {
+            _audioInformation.buffer_size = 1024 * 1024;
+        }
+//        assert(_audioInformation.buffer_size > 0);
         _audioInformation.rate = self->codecContext->sample_rate;
         _audioInformation.bytesPerSample = _audioInformation.channels * av_get_bytes_per_sample(_audioInformation.format);
         _audioInformation.bitsPerChannel = 8 * av_get_bytes_per_sample(_audioInformation.format);

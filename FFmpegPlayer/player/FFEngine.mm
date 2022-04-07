@@ -16,6 +16,8 @@
 
 #define MAX_AUDIO_FRAME_DURATION   2
 #define MIN_AUDIO_FRAME_DURATION   1
+#define MAX_AUDIO_FRAME_COUNT      20
+#define MIN_AUDIO_FRAME_COUNT      10
 
 #define MAX_VIDEO_FRAME_DURATION   2
 #define MIN_VIDEO_FRAME_DURATION   1
@@ -197,9 +199,9 @@ fail:
         while (true) {
             float audioCacheDuration = [self.audioFrameCacheQueue count] * [self.mediaAudioContext oneFrameDuration];
             float videoCacheDuration = [self.videoFrameCacheQueue count] * [self.mediaVideoContext oneFrameDuration];
-            NSLog(@"【Cache】%f, %f", videoCacheDuration, audioCacheDuration);
+            NSLog(@"【Cache】%f, %f, %ld", videoCacheDuration, audioCacheDuration, [self.audioFrameCacheQueue count]);
             /// Video与Audio缓冲帧都超过最大数时暂停解码线程,等待唤醒
-            if((!self.mediaAudioContext || audioCacheDuration >= MAX_AUDIO_FRAME_DURATION) &&
+            if((!self.mediaAudioContext || audioCacheDuration >= MAX_AUDIO_FRAME_DURATION || [self.audioFrameCacheQueue count] >= MAX_AUDIO_FRAME_COUNT) &&
                (!self.mediaVideoContext || videoCacheDuration >= MAX_VIDEO_FRAME_DURATION)) {
                 NSLog(@"Decode wait...");
                 if(self.playState == FFPlayStateLoading) {
@@ -246,20 +248,18 @@ fail:
                     uint64_t duration = self->formatContext->streams[self.mediaAudioContext.streamIndex]->duration;
                     float unit = av_q2d(self.mediaAudioContext.codecContext->time_base);
                     NSLog(@"【PTS】【Audio】: %f, duration: %lld, last: %lld", self->packet->pts * unit, duration, self->packet->duration);
-                    int buffer_size = self.mediaAudioContext.audioInformation.buffer_size;
-                    FFQueueAudioObject *obj = [[FFQueueAudioObject alloc] initWithLength:buffer_size pts:self->packet->pts * unit duration:self->packet->duration * unit];
-                    uint8_t *buffer = obj.data;
-                    int64_t bufferSize = 0;
                     pthread_mutex_lock(&(self->mutex));
-                    BOOL ret = [self.mediaAudioContext decodePacket:self->packet outBuffer:&buffer outBufferSize:&bufferSize];
+                    NSArray<FFQueueAudioObject *> *objs = [self.mediaAudioContext decodePacket:self->packet];
                     pthread_mutex_unlock(&(self->mutex));
-                    if(ret) {
-                        [obj updateLength:bufferSize];
-                        [self.audioFrameCacheQueue enqueue:obj];
+                    if(objs.count > 0) {
+                        for(FFQueueAudioObject *obj in objs) {
+                            [self.audioFrameCacheQueue enqueue:obj];
+                        }
                         audioCacheDuration = [self.audioFrameCacheQueue count] * [self.mediaAudioContext oneFrameDuration];
+
                         /// 通知音频渲染队列可以继续渲染了
                         /// 如果音频渲染队列未暂停则无作用
-                        if(audioCacheDuration >= MIN_AUDIO_FRAME_DURATION) {
+                        if(audioCacheDuration >= MIN_AUDIO_FRAME_DURATION || [self.audioFrameCacheQueue count] > MIN_AUDIO_FRAME_COUNT) {
                             _NotifyWaitThreadWakeUp(self.audioPlayCondition);
                         }
                     }
@@ -378,13 +378,15 @@ fail:
         pthread_mutex_lock(&(self->mutex));
         BOOL isDecodeComplete = self.isDecodeComplete;
         pthread_mutex_unlock(&(self->mutex));
-        if(audioCacheDuration < MIN_AUDIO_FRAME_DURATION && !isDecodeComplete) {
+        if(audioCacheDuration < MIN_AUDIO_FRAME_DURATION && [self.audioFrameCacheQueue count] < MIN_AUDIO_FRAME_COUNT && !isDecodeComplete) {
             NSLog(@"Audio is not enough, wait…");
+            NSLog(@"audio1 [_NotifyWaitThreadWakeUp]: %ld", [self.audioFrameCacheQueue count]);
             _NotifyWaitThreadWakeUp(self.decodeCondition);
             _SleepThread(self.audioPlayCondition);
         }
         FFQueueAudioObject *obj = [self.audioFrameCacheQueue dequeue];
-        if(audioCacheDuration < MAX_AUDIO_FRAME_DURATION) {
+        if(audioCacheDuration < MAX_AUDIO_FRAME_DURATION && [self.audioFrameCacheQueue count] < MAX_AUDIO_FRAME_COUNT) {
+            NSLog(@"audio2 [_NotifyWaitThreadWakeUp]: %ld", [self.audioFrameCacheQueue count]);
             _NotifyWaitThreadWakeUp(self.decodeCondition);
         }
         if(obj) {

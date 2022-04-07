@@ -7,6 +7,7 @@
 
 #import "FFObjectQueue.h"
 #import <pthread.h>
+#import "FFQueueAudioObject.h"
 
 @interface FFObjectQueue()
 @property(nonatomic, strong)NSMutableArray *storage;
@@ -53,5 +54,14 @@
     pthread_mutex_lock(&locker);
     [_storage removeAllObjects];
     pthread_mutex_unlock(&locker);
+}
+- (float)duration {
+    float _duration = 0;
+    pthread_mutex_lock(&locker);
+    for(FFQueueAudioObject *obj in _storage) {
+        _duration += obj.duration;
+    }
+    pthread_mutex_unlock(&locker);
+    return _duration;
 }
 @end

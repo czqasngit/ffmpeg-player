@@ -14,6 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)enqueue:(id)object;
 - (NSInteger)count;
 - (void)clean;
+- (float)duration;
 @end
 
 NS_ASSUME_NONNULL_END

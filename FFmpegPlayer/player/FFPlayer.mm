@@ -22,7 +22,7 @@
 - (instancetype)init {
     self = [super init];
     if (self) {
-        _videoRender = [[FFMetalRender alloc] init];
+        _videoRender = [[FFOpenGLRender alloc] init];
         _engine = [[FFEngine alloc] initWithVideoRender:self.videoRender delegate:self];
     }
     return self;

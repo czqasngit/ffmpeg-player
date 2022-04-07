@@ -12,6 +12,7 @@ extern "C" {
 #include <libswresample/swresample.h>
 }
 #import "FFAudioInformation.h"
+#import "FFQueueAudioObject.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -21,7 +22,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, assign, readonly)int64_t lastFramePts;
 
 - (instancetype)initWithAVStream:(AVStream *)stream formatContext:(AVFormatContext *)formatContext;
-- (BOOL)decodePacket:(AVPacket *)packet outBuffer:(uint8_t *_Nonnull* _Nonnull )buffer outBufferSize:(int64_t *)outBufferSize;
+- (NSArray<FFQueueAudioObject *> *)decodePacket:(AVPacket *)packet;
 - (AVCodecContext *)codecContext;
 /// 播放器参数
 - (FFAudioInformation)audioInformation;
