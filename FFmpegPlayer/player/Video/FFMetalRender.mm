@@ -9,6 +9,37 @@
 
 #define _CFToString(obj) ((__bridge NSString *)obj)
 
+static void NV12Copy(uint8_t *src_y, int src_stride_y,
+                     uint8_t *src_uv, int src_stride_uv,
+                     uint8_t *dst_y, int dst_stride_y,
+                     uint8_t *dst_uv, int dst_stride_uv,
+                     int width, int height)
+{
+    
+    if (src_stride_y == width && dst_stride_y == width) {
+        width *= height;
+        height = 1;
+        src_stride_y = dst_stride_y = 0;
+    }
+    // Nothing to do.
+    if (src_y == dst_y && src_stride_y == dst_stride_y) {
+        return;
+    }
+    for (int i = 0; i < height; ++i) {
+        memcpy(dst_y, src_y, width);
+        src_y += src_stride_y;
+        dst_y += dst_stride_y;
+    }
+    
+    for (int i = 0; i < height/2; ++i) {
+        memcpy(dst_uv, src_uv, width);
+        src_uv += src_stride_uv;
+        dst_uv += dst_stride_uv;
+    }
+}
+
+
+
 @interface FFMetalRender()
 @property (nonatomic, strong)id<MTLCommandQueue> commandQueue;
 @property (nonatomic, strong)id<MTLComputePipelineState> computePipline;
@@ -92,14 +123,15 @@
         return NULL;
     }
     CVPixelBufferLockBaseAddress(_pixelBufferRef, 0);
-    /// copy y
     size_t yBytesPerRowSize = CVPixelBufferGetBytesPerRowOfPlane(_pixelBufferRef, 0);
-    void *yBase = CVPixelBufferGetBaseAddressOfPlane(_pixelBufferRef, 0);
-    memcpy(yBase, frame->data[0], yBytesPerRowSize * frame->height);
-    /// copy uv
-    void *uvBase = CVPixelBufferGetBaseAddressOfPlane(_pixelBufferRef, 1);
+    uint8_t*yBase = (uint8_t *)CVPixelBufferGetBaseAddressOfPlane(_pixelBufferRef, 0);
+    uint8_t *uvBase = (uint8_t *)CVPixelBufferGetBaseAddressOfPlane(_pixelBufferRef, 1);
     size_t uvBytesPerRowSize = CVPixelBufferGetBytesPerRowOfPlane(_pixelBufferRef, 1);
-    memcpy(uvBase, frame->data[1], uvBytesPerRowSize * frame->height / 2);
+    NV12Copy(frame->data[0], frame->linesize[0],
+             frame->data[1], frame->linesize[1],
+             yBase, (int)yBytesPerRowSize,
+             uvBase, (int)uvBytesPerRowSize,
+             frame->width, frame->height);
     CVPixelBufferUnlockBaseAddress(_pixelBufferRef, 0);
     CFTimeInterval end = CACurrentMediaTime();
 //    NSLog(@"耗时: %f", end - start);
@@ -181,5 +213,4 @@
 - (AVPixelFormat)pixelFormat {
     return AV_PIX_FMT_NV12;
 }
-
 @end
